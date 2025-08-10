@@ -6,7 +6,7 @@
 <title>Chef's Ingredient Converter</title>
 <style>
   :root{
-    --brand:#5a2d82; --brand-2:#7c4dad; --muted:#666; --bg:#f6f6f8;
+    --brand:#5a2d82; --muted:#666; --bg:#f6f6f8;
     --card:#fff; --radius:10px;
   }
   html,body{height:100%; margin:0; font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;}
@@ -29,38 +29,25 @@
   .muted{color:var(--muted); font-size:0.9rem;}
   .right{text-align:right;}
   .copy-btn{margin-right:6px; font-size:0.85rem; padding:4px 6px; border-radius:6px;}
-  .row-actions button{margin-left:6px;}
   .controls .spacer{flex:1;}
   .help{font-size:0.85rem; color:var(--muted); margin-top:8px;}
   .small-muted{color:#777; font-size:0.9rem;}
   .ingredient-manager{margin-top:18px; display:block; }
-  .danger{background:#ff6b6b;}
   .pill{display:inline-block; padding:6px 8px; background:#f1f1f6; border-radius:999px; font-size:0.85rem;}
-  .sr-only{position:absolute; left:-9999px;}
-
-  /* Layout tweaks to prioritize Conversions column */
-  /* We make first three columns narrow and give Conversions big space */
-  th.col-ingredient{width:28%;}
+  .conv-block { display:inline-flex; align-items:center; gap:8px; padding:6px; border-radius:6px; background:#fafafa; margin-right:6px; }
+  .conv-copy { background:#eef; border-radius:6px; padding:4px 6px; cursor:pointer; border:1px solid #dde; font-size:0.85rem; }
+  td.conv-cell { white-space:nowrap; overflow:visible; font-feature-settings: "tnum"; }
+  /* a slightly larger conversions column so it gets priority in small layouts */
+  th.col-ingredient{width:30%;}
   th.col-amount{width:12%;}
   th.col-unit{width:12%;}
-  th.col-conversions{width:48%;} /* larger weight */
-
-  /* Make conversions not wrap easily */
-  td.conv-cell { white-space:nowrap; overflow:visible; font-feature-settings: "tnum"; }
-
-  /* On small screens, allow horizontal scrolling inside conversions cell (but keep it single-line) */
+  th.col-conversions{width:46%;}
   @media (max-width:640px){
     table { table-layout:auto; }
     td.conv-cell { overflow-x:auto; }
-    th.col-ingredient{width:34%;}
-    th.col-conversions{width:56%;}
+    th.col-ingredient{width:36%;}
+    th.col-conversions{width:50%;}
   }
-
-  /* small utility */
-  .inline-flex{display:inline-flex; align-items:center; gap:6px;}
-  .conv-block { display:inline-flex; align-items:center; gap:8px; padding-right:10px; border-radius:6px; background:#fafafa; margin-right:6px; padding:6px; }
-  .conv-copy { background:#eef; border-radius:6px; padding:4px 6px; cursor:pointer; border:1px solid #dde; font-size:0.85rem; }
-  .small-muted{font-size:0.85rem; color:#666;}
 </style>
 </head>
 <body>
@@ -68,12 +55,12 @@
   <header>
     <div style="flex:1;">
       <h1>Chef's Ingredient Converter</h1>
-      <p class="lead">Translate metric weights (g/kg/ml/l) used in pro kitchens into U.S. home measurements (cups, tbsp, tsp).</p>
+      <p class="lead">Translate metric weights (g/kg/ml/l) used in pro kitchens into U.S. home measures (cups, tbsp, tsp).</p>
     </div>
     <div style="margin-left:auto" class="pill">1 US cup = 236.588 ml</div>
   </header>
 
-  <div class="card">
+  <div class="card" id="mainCard">
     <div class="controls">
       <button id="addRowBtn">➕ Add Ingredient</button>
       <button id="copyTableBtn">📋 Copy Entire Table</button>
@@ -95,12 +82,12 @@
       <tbody></tbody>
     </table>
 
-    <p class="help">Tip: Use the "Override name" field to give a custom name that will be used for copying/export/printing. The ingredient selector still chooses the density used for conversion.</p>
+    <p class="help">Tip: Use the "Override name" to label the ingredient for copying/exporting. Select the density using the ingredient dropdown (density is grams per US cup).</p>
 
-    <!-- Ingredient Manager moved BELOW the table as requested -->
+    <!-- Ingredient Manager BELOW the conversion table -->
     <div class="ingredient-manager card" id="managerCard" style="margin-top:18px;">
       <h3 style="margin-top:0">Ingredient Manager</h3>
-      <p class="small-muted">Add or edit ingredient densities (grams per US cup). These are saved locally in your browser.</p>
+      <p class="small-muted">Add or edit ingredient densities (grams per US cup). Data saved locally in your browser.</p>
 
       <div style="display:flex; gap:8px; margin-top:8px;">
         <input id="newIngName" type="text" placeholder="Ingredient name">
@@ -126,7 +113,16 @@
 </div>
 
 <script>
-/* ---------- Data & defaults ---------- */
+/*
+  Chef's Ingredient Converter - single-file
+  - Works as static site (Github Pages)
+  - Persistent densities and rows in localStorage
+  - Override name used for copy/export/print
+  - Copy buttons on left of each conversion block
+  - Defensive clipboard handling + fallback
+*/
+
+/* ----- Defaults and constants ----- */
 const DEFAULT_DENSITIES = {
   "All-Purpose Flour": 120,
   "Bread Flour": 125,
@@ -156,7 +152,7 @@ const METRIC_UNITS = [
   {value:'l', label:'l'}
 ];
 
-/* ---------- DOM ---------- */
+/* ----- Cached DOM references ----- */
 const tbody = document.querySelector('#convTable tbody');
 const addRowBtn = document.getElementById('addRowBtn');
 const copyTableBtn = document.getElementById('copyTableBtn');
@@ -170,10 +166,10 @@ const newIngDensity = document.getElementById('newIngDensity');
 const resetDefaultsBtn = document.getElementById('resetDefaults');
 const clearStorageBtn = document.getElementById('clearStorage');
 
-/* ---------- State ---------- */
-let densities = loadDensities();
+/* ----- State ----- */
+let densities = loadDensities(); // object name -> grams per cup
 
-/* ---------- Utilities ---------- */
+/* ----- Utilities ----- */
 function loadDensities(){
   try {
     const raw = localStorage.getItem(STORAGE_ING);
@@ -181,13 +177,32 @@ function loadDensities(){
       const parsed = JSON.parse(raw);
       return {...DEFAULT_DENSITIES, ...parsed};
     }
-  } catch(e){ console.warn('failed load densities', e); }
+  } catch(e){ console.warn('loadDensities error', e); }
   return {...DEFAULT_DENSITIES};
 }
-function saveDensities(){ try{ localStorage.setItem(STORAGE_ING, JSON.stringify(densities)); } catch(e){console.warn(e);} }
-function loadRows(){ try { const raw = localStorage.getItem(STORAGE_ROWS); if(raw) return JSON.parse(raw); } catch(e){console.warn(e);} return []; }
-function saveRows(){ try { const toSave = Array.from(tbody.querySelectorAll('tr')).map(tr => { return { ingredient: tr.querySelector('.ing-select')?.value || '', override: tr.querySelector('.override-input')?.value || '', amount: tr.querySelector('.amount-input')?.value || '', unit: tr.querySelector('.unit-select')?.value || '' }; }); localStorage.setItem(STORAGE_ROWS, JSON.stringify(toSave)); } catch(e){console.warn(e);} }
+function saveDensities(){ try{ localStorage.setItem(STORAGE_ING, JSON.stringify(densities)); } catch(e){ console.warn(e); } }
+function loadRows(){
+  try {
+    const raw = localStorage.getItem(STORAGE_ROWS);
+    if(raw) return JSON.parse(raw);
+  } catch(e){ console.warn('loadRows error', e); }
+  return [];
+}
+function saveRows(){
+  try {
+    const toSave = Array.from(tbody.querySelectorAll('tr')).map(tr => {
+      return {
+        ingredient: tr.querySelector('.ing-select')?.value || '',
+        override: tr.querySelector('.override-input')?.value || '',
+        amount: tr.querySelector('.amount-input')?.value || '',
+        unit: tr.querySelector('.unit-select')?.value || ''
+      };
+    });
+    localStorage.setItem(STORAGE_ROWS, JSON.stringify(toSave));
+  } catch(e){ console.warn('saveRows error', e); }
+}
 
+/* small element factory */
 function el(tag, props={}, ...children){
   const node = document.createElement(tag);
   for(const k in props){
@@ -202,36 +217,35 @@ function el(tag, props={}, ...children){
   return node;
 }
 
-/* ---------- Table / rows ---------- */
-
+/* ----- UI: create ingredient select (populated from densities) ----- */
 function createIngredientSelect(value=''){
   const select = el('select', {class:'ing-select'});
   select.appendChild(el('option',{value:''}, '— pick ingredient —'));
   const names = Object.keys(densities).sort((a,b)=>a.localeCompare(b));
   for(const n of names){
     const o = el('option',{value:n}, n);
-    if(n===value) o.selected=true;
+    if(n === value) o.selected = true;
     select.appendChild(o);
   }
-  select.addEventListener('change', (e)=> {
-    // keep override input untouched; conversions may update
-    if(autoConvertToggle.checked) convertRow(select.closest('tr'));
+  select.addEventListener('change', ()=> {
+    // do not overwrite override input; conversion will update if auto enabled
+    const tr = select.closest('tr');
+    if(tr && autoConvertToggle.checked) convertRow(tr);
   });
   return select;
 }
 
-function addRow(pref = {ingredient:'', override:'', amount:'', unit:'g'}, focus=true){
+/* ----- Add row (creates full DOM row, hooks up events) ----- */
+function addRow(pref={ingredient:'', override:'', amount:'', unit:'g'}, focus=true){
   const tr = document.createElement('tr');
 
-  // Ingredient + override cell
+  // Ingredient column: override input + select (select picks density used)
   const ingTd = el('td');
-  // override input (user-specified display name)
   const overrideInput = el('input', {type:'text', placeholder:'Override name (optional)', class:'override-input'});
   overrideInput.value = pref.override || '';
   overrideInput.addEventListener('input', ()=> { if(autoConvertToggle.checked) convertRow(tr); });
 
   const ingSelect = createIngredientSelect(pref.ingredient || '');
-  // optional small label to show density used
   ingTd.appendChild(overrideInput);
   ingTd.appendChild(ingSelect);
   tr.appendChild(ingTd);
@@ -240,7 +254,7 @@ function addRow(pref = {ingredient:'', override:'', amount:'', unit:'g'}, focus=
   const amtTd = el('td');
   const amtInput = el('input', {type:'number', step:'0.01', class:'amount-input', placeholder:'0'});
   amtInput.value = pref.amount || '';
-  amtInput.addEventListener('input', ()=>{ if(autoConvertToggle.checked) convertRow(tr); });
+  amtInput.addEventListener('input', ()=> { if(autoConvertToggle.checked) convertRow(tr); });
   amtTd.appendChild(amtInput);
   tr.appendChild(amtTd);
 
@@ -252,20 +266,20 @@ function addRow(pref = {ingredient:'', override:'', amount:'', unit:'g'}, focus=
     if(u.value === (pref.unit || 'g')) o.selected=true;
     unitSelect.appendChild(o);
   }
-  unitSelect.addEventListener('change', ()=>{ if(autoConvertToggle.checked) convertRow(tr); });
+  unitSelect.addEventListener('change', ()=> { if(autoConvertToggle.checked) convertRow(tr); });
   unitTd.appendChild(unitSelect);
   tr.appendChild(unitTd);
 
-  // Conversions (wider, prioritized)
+  // Conversions cell
   const convTd = el('td', {class:'conv-cell'}, '—');
   tr.appendChild(convTd);
 
-  // Actions
+  // Actions: Convert / Copy Row / Remove
   const actionsTd = el('td', {class:'actions right'});
   const convertBtn = el('button', {type:'button', class:'small'}, 'Convert');
-  convertBtn.addEventListener('click', ()=>convertRow(tr));
+  convertBtn.addEventListener('click', ()=> convertRow(tr));
 
-  const copyRowBtn = el('button', {type:'button', class:'small copy-row-btn'}, 'Copy Row');
+  const copyRowBtn = el('button', {type:'button', class:'small'}, 'Copy Row');
   copyRowBtn.addEventListener('click', ()=> copyRow(tr));
 
   const removeBtn = el('button', {type:'button', class:'small'}, 'Remove');
@@ -286,7 +300,7 @@ function addRow(pref = {ingredient:'', override:'', amount:'', unit:'g'}, focus=
   return tr;
 }
 
-/* conversion logic */
+/* ----- Conversions ----- */
 function roundTo(num, decimals){
   const factor = Math.pow(10, decimals);
   return (Math.round((num + Number.EPSILON) * factor) / factor).toFixed(decimals);
@@ -296,14 +310,13 @@ function convertRow(tr){
   if(!tr) return;
   const overrideName = tr.querySelector('.override-input')?.value.trim();
   const ingSelect = tr.querySelector('.ing-select');
-  // preferred ingredient for density comes from select; if nothing selected show message
   const ingredient = ingSelect?.value || '';
   const amountStr = tr.querySelector('.amount-input')?.value;
   const unit = tr.querySelector('.unit-select')?.value;
   const convCell = tr.querySelector('.conv-cell');
 
   if(!ingredient){
-    convCell.textContent = 'Pick ingredient (or add density)';
+    convCell.textContent = 'Pick ingredient';
     return;
   }
   const density = densities[ingredient];
@@ -317,7 +330,7 @@ function convertRow(tr){
     return;
   }
 
-  // grams calculation
+  // compute grams
   let grams;
   if(unit === 'g') grams = amount;
   else if(unit === 'kg') grams = amount * 1000;
@@ -333,27 +346,44 @@ function convertRow(tr){
   const tbspFmt = roundTo(tbsp, 2);
   const tspFmt = roundTo(tsp, 2);
 
-  // Build conversions UI with copy buttons LEFT of each conversion value (user requested)
-  // Use data-copy attributes for delegation
+  // Build conversions with copy buttons to the LEFT of each value (user requested)
+  const displayName = overrideName || ingredient;
   convCell.innerHTML = `
     <div style="display:flex;flex-wrap:nowrap;gap:8px;align-items:center;">
-      <div class="conv-block"><button class="conv-copy" data-copy="${overrideName || ingredient}\t${cupsFmt} cup(s)">${'📋'}</button><div>${cupsFmt} cup(s)</div></div>
-      <div class="conv-block"><button class="conv-copy" data-copy="${overrideName || ingredient}\t${tbspFmt} tbsp">${'📋'}</button><div>${tbspFmt} tbsp</div></div>
-      <div class="conv-block"><button class="conv-copy" data-copy="${overrideName || ingredient}\t${tspFmt} tsp">${'📋'}</button><div>${tspFmt} tsp</div></div>
-      <div class="small-muted" style="margin-left:8px">(${grams.toFixed(1)} g)</div>
+      <div class="conv-block"><button class="conv-copy" data-copy="${escapeForClipboard(displayName)}\t${cupsFmt} cup(s)">${'📋'}</button><div>${cupsFmt} cup(s)</div></div>
+      <div class="conv-block"><button class="conv-copy" data-copy="${escapeForClipboard(displayName)}\t${tbspFmt} tbsp">${'📋'}</button><div>${tbspFmt} tbsp</div></div>
+      <div class="conv-block"><button class="conv-copy" data-copy="${escapeForClipboard(displayName)}\t${tspFmt} tsp">${'📋'}</button><div>${tspFmt} tsp</div></div>
+      <div class="small-muted" style="margin-left:6px">(${grams.toFixed(1)} g)</div>
     </div>
   `;
   saveRows();
 }
 
-/* ---------- copy/export helpers ---------- */
+/* escape tabs/newlines for clipboard-safe single-line */
+function escapeForClipboard(text){
+  return String(text).replace(/\s+/g,' ').replace(/"/g,'"');
+}
 
-async function copyText(txt){
+/* ----- Copy & Export helpers ----- */
+async function copyText(text){
+  // navigator.clipboard is best, but must be in secure context. fallback to textarea execCommand
   try {
-    await navigator.clipboard.writeText(txt);
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      await navigator.clipboard.writeText(text);
+      return true;
+    }
+  } catch(e){ console.warn('clipboard write failed', e); }
+  // fallback
+  try {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    ta.remove();
     return true;
   } catch(e){
-    alert('Copy failed — please allow clipboard access or copy manually:\n' + txt);
+    console.warn('fallback copy failed', e);
     return false;
   }
 }
@@ -370,17 +400,23 @@ function rowToDisplayText(tr){
 
 function copyRow(tr){
   const text = rowToDisplayText(tr);
-  copyText(text).then(()=> alert('Row copied to clipboard'));
+  copyText(text).then(ok => {
+    if(ok) alert('Row copied to clipboard');
+    else alert('Copy failed — try selecting the content manually.');
+  });
 }
 
+/* Full table copy */
 copyTableBtn.addEventListener('click', async ()=>{
   const rows = Array.from(tbody.querySelectorAll('tr')).map(rowToDisplayText);
   const header = "Ingredient\tAmount\tConversions";
   const text = [header, ...rows].join("\n");
-  await copyText(text);
-  alert('Table copied to clipboard');
+  const ok = await copyText(text);
+  if(ok) alert('Table copied to clipboard');
+  else alert('Copy failed — try exporting CSV instead.');
 });
 
+/* CSV export */
 exportCSVBtn.addEventListener('click', ()=>{
   const rows = Array.from(tbody.querySelectorAll('tr')).map(tr => {
     const override = tr.querySelector('.override-input')?.value.trim();
@@ -395,12 +431,13 @@ exportCSVBtn.addEventListener('click', ()=>{
   const blob = new Blob([csv], {type:'text/csv'});
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
-  a.href = url; a.download = `ingredient_conversions_${new Date().toISOString().slice(0,10)}.csv`; a.click();
+  a.href = url;
+  a.download = `ingredient_conversions_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
   URL.revokeObjectURL(url);
 });
 
-/* ---------- ingredient manager ---------- */
-
+/* ----- Ingredient Manager UI ----- */
 function renderIngredientList(){
   ingListEl.innerHTML = '';
   const names = Object.keys(densities).sort((a,b)=>a.localeCompare(b));
@@ -414,8 +451,7 @@ function renderIngredientList(){
         densities[n] = val;
         saveDensities();
         if(autoConvertToggle.checked){
-          for(const tr of tbody.querySelectorAll('tr')) {
-            // if that row uses this ingredient, reconvert
+          for(const tr of tbody.querySelectorAll('tr')){
             const sel = tr.querySelector('.ing-select');
             if(sel && sel.value === n) convertRow(tr);
           }
@@ -433,6 +469,7 @@ function renderIngredientList(){
       delete densities[n];
       saveDensities();
       renderIngredientList();
+      updateSelects();
       for(const tr of tbody.querySelectorAll('tr')){
         const sel = tr.querySelector('.ing-select');
         if(sel && sel.value === n){
@@ -451,12 +488,15 @@ function renderIngredientList(){
   renderSavedCount();
 }
 
-function renderSavedCount(){ savedCountEl.textContent = `${Object.keys(densities).length} ingredients saved locally`; }
+function renderSavedCount(){
+  savedCountEl.textContent = `${Object.keys(densities).length} ingredients saved locally`;
+}
 
+/* Add ingredient button handler */
 addIngredientBtn.addEventListener('click', ()=>{
   const name = newIngName.value.trim();
   const dens = parseFloat(newIngDensity.value);
-  if(!name) return alert('Enter a name');
+  if(!name) return alert('Enter an ingredient name');
   if(isNaN(dens) || dens <= 0) return alert('Enter a valid density (g per cup)');
   densities[name] = dens;
   saveDensities();
@@ -465,6 +505,7 @@ addIngredientBtn.addEventListener('click', ()=>{
   updateSelects();
 });
 
+/* Reset defaults / clear storage handlers */
 resetDefaultsBtn.addEventListener('click', ()=>{
   if(!confirm('Reset to default density list? This will overwrite local custom densities.')) return;
   densities = {...DEFAULT_DENSITIES};
@@ -484,8 +525,7 @@ clearStorageBtn.addEventListener('click', ()=>{
   renderSavedCount();
 });
 
-/* ---------- select update and hydration ---------- */
-
+/* ----- Update selects after densities change ----- */
 function updateSelects(){
   const names = Object.keys(densities).sort((a,b)=>a.localeCompare(b));
   for(const sel of tbody.querySelectorAll('.ing-select')){
@@ -500,6 +540,7 @@ function updateSelects(){
   }
 }
 
+/* ----- Hydrate rows from localStorage on load ----- */
 function hydrateRows(){
   const saved = loadRows();
   if(saved && saved.length){
@@ -511,23 +552,44 @@ function hydrateRows(){
   }
 }
 
-/* ---------- event delegation for conv-copy buttons ---------- */
+/* ----- Global delegated copy handler for conv-copy buttons ----- */
 document.addEventListener('click', (ev)=>{
   const copyBtn = ev.target.closest('.conv-copy');
   if(copyBtn && copyBtn.dataset && copyBtn.dataset.copy){
-    copyText(copyBtn.dataset.copy).then(()=> {
+    copyText(copyBtn.dataset.copy).then(ok => {
       const old = copyBtn.textContent;
-      copyBtn.textContent = '✅';
-      setTimeout(()=> copyBtn.textContent = old, 700);
+      if(ok){
+        copyBtn.textContent = '✅';
+        setTimeout(()=> copyBtn.textContent = old, 700);
+      } else {
+        alert('Copy failed — please try selecting the text manually.');
+      }
     });
   }
 });
 
-/* ---------- other handlers ---------- */
+/* ----- Hook up main controls ----- */
 addRowBtn.addEventListener('click', ()=> addRow({ingredient:'', override:'', amount:'', unit:'g'}, true));
-autoConvertToggle.addEventListener('change', ()=> { if(autoConvertToggle.checked){ for(const tr of tbody.querySelectorAll('tr')) convertRow(tr); } saveRows(); });
+autoConvertToggle.addEventListener('change', ()=> {
+  if(autoConvertToggle.checked){
+    for(const tr of tbody.querySelectorAll('tr')) convertRow(tr);
+  }
+  saveRows();
+});
 
+/* debounce saving rows on input */
 let saveTimer = null;
 tbody.addEventListener('input', ()=> {
   if(saveTimer) clearTimeout(saveTimer);
-  saveTimer = setTimeout
+  saveTimer = setTimeout(()=> { saveRows(); saveTimer = null; }, 450);
+});
+
+/* ----- Init ----- */
+(function init(){
+  renderIngredientList();
+  hydrateRows();
+  updateSelects();
+})();
+</script>
+</body>
+</html>
