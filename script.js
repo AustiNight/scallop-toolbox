@@ -666,12 +666,22 @@
     const tspFmt  = roundTo(tsp, 2);
     const display = (overrideName || ingredient).replace(/\s+/g,' ').trim();
 
+    // UPDATED: stack conversions vertically with spacing to prevent overflow
     convCell.innerHTML = `
-      <div style="display:flex;flex-wrap:nowrap;align-items:center;gap:8px">
-        <div class="conv-block"><button class="conv-copy" data-copy="${display}\t${cupsFmt} cup(s)">📋</button><div>${cupsFmt} cup(s)</div></div>
-        <div class="conv-block"><button class="conv-copy" data-copy="${display}\t${tbspFmt} tbsp">📋</button><div>${tbspFmt} tbsp</div></div>
-        <div class="conv-block"><button class="conv-copy" data-copy="${display}\t${tspFmt} tsp">📋</button><div>${tspFmt} tsp</div></div>
-        <div style="color:#777;margin-left:6px">(${grams.toFixed(1)} g)</div>
+      <div style="display:flex;flex-direction:column;align-items:flex-start;gap:10px">
+        <div class="conv-block" style="margin:0">
+          <button class="conv-copy" data-copy="${display}\t${cupsFmt} cup(s)">📋</button>
+          <div>${cupsFmt} cup(s)</div>
+        </div>
+        <div class="conv-block" style="margin:0">
+          <button class="conv-copy" data-copy="${display}\t${tbspFmt} tbsp">📋</button>
+          <div>${tbspFmt} tbsp</div>
+        </div>
+        <div class="conv-block" style="margin:0">
+          <button class="conv-copy" data-copy="${display}\t${tspFmt} tsp">📋</button>
+          <div>${tspFmt} tsp</div>
+        </div>
+        <div style="color:#777;font-size:0.9em">(${grams.toFixed(1)} g)</div>
       </div>`;
     saveRows();
   }
