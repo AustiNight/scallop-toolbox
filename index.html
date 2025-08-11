@@ -6,81 +6,50 @@
 <title>Chef's Ingredient Converter</title>
 <style>
   :root{
-    --brand:#5a2d82;
-    --muted:#666;
-    --bg:#f6f6f8;
-    --card:#fff;
-    --radius:10px;
-    --gap:12px;
-    --actions-width:100px;
+    --brand:#5a2d82; --muted:#666; --bg:#f6f6f8; --card:#fff; --radius:10px; --actions-width:100px;
   }
   *{box-sizing:border-box}
-  body{
-    margin:0;
-    font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial;
-    background:var(--bg);
-    color:#222;
-    padding:18px;
-  }
+  body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial;background:var(--bg);color:#222;padding:18px}
   .app{max-width:1100px;margin:0 auto}
-  header{display:flex;gap:12px;align-items:center;justify-content:space-between;margin-bottom:12px}
+  header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
   h1{margin:0;color:var(--brand);font-size:1.5rem}
-  p.lead{margin:0;color:var(--muted);font-size:0.95rem}
   .pill{background:#fff;padding:6px 12px;border-radius:999px;border:1px solid #eee;color:var(--brand);font-weight:600}
-  .card{background:var(--card);border-radius:10px;padding:14px;box-shadow:0 6px 20px rgba(20,20,30,0.04);margin-bottom:14px}
+  .card{background:var(--card);border-radius:12px;padding:16px;box-shadow:0 6px 20px rgba(20,20,30,0.04);margin-bottom:14px}
   .controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
-  button{background:var(--brand);color:#fff;border:0;padding:8px 10px;border-radius:8px;cursor:pointer}
+  button{background:var(--brand);color:#fff;border:0;padding:8px 12px;border-radius:8px;cursor:pointer}
   button.secondary{background:#fff;color:var(--brand);border:1px solid #ddd}
-  button.ghost{background:transparent;color:var(--brand);border:1px dashed #ddd}
-  .help{color:var(--muted);font-size:0.9rem;margin-top:8px}
-  .table-wrapper{ overflow:auto; position:relative; padding-right: calc(var(--actions-width) + 12px); }
-  table{width:100%; border-collapse:collapse; min-width:720px; table-layout:fixed;}
-  thead th{background:var(--brand); color:#fff; padding:12px 10px; font-weight:600; text-align:left; font-size:0.95rem}
-  tbody td{padding:10px 8px; border-bottom:1px solid #eee; font-size:0.92rem; vertical-align:middle; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
-  th.col-ingredient{width:34%}
-  th.col-amount{width:12%}
-  th.col-unit{width:12%}
-  th.col-conversions{width:42%}
-  th.col-actions, td.actions{ width:var(--actions-width); min-width:var(--actions-width); max-width:var(--actions-width); text-align:right; vertical-align:middle }
-  th.col-actions, td.actions {
-    position: -webkit-sticky;
-    position: sticky;
-    right: 0;
-    background: linear-gradient(0deg,#fff,#fff);
-    box-shadow: -8px 0 8px rgba(0,0,0,0.03);
-    z-index: 5;
-  }
+  .help{color:var(--muted);font-size:0.95rem;margin-top:8px}
+  .table-wrapper{overflow:auto;position:relative;padding-right:calc(var(--actions-width) + 12px)}
+  table{width:100%;border-collapse:collapse;min-width:720px;table-layout:fixed}
+  thead th{background:var(--brand);color:#fff;padding:12px 10px;text-align:left;font-weight:700}
+  tbody td{padding:10px 8px;border-bottom:1px solid #eee;font-size:0.92rem;vertical-align:middle;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  th.col-ingredient{width:34%} th.col-amount{width:12%} th.col-unit{width:12%} th.col-conversions{width:42%}
+  th.col-actions, td.actions{width:var(--actions-width);min-width:var(--actions-width);max-width:var(--actions-width);text-align:right;vertical-align:middle}
+  th.col-actions, td.actions{position:sticky;right:0;background:linear-gradient(0deg,#fff,#fff);box-shadow:-8px 0 8px rgba(0,0,0,0.03);z-index:5}
   .conv-block{display:inline-flex;align-items:center;gap:8px;background:#fafafa;padding:6px 8px;border-radius:8px;margin-right:6px}
-  .conv-copy{background:#eef;border:1px solid #dde;border-radius:6px;padding:4px 6px;cursor:pointer;font-size:0.9rem}
-  .actions .btn{display:inline-block;margin-left:6px;padding:6px 8px;border-radius:8px;border:0;cursor:pointer}
-  .small{font-size:0.9rem;padding:6px 8px;border-radius:6px}
-  .removeBtn{background:#fff;color:#b33;border:1px solid #f3c7c7}
-  @media (max-width:720px){
-    table{min-width:640px}
-    th.col-ingredient{width:36%}
-    th.col-conversions{width:44%}
-    .controls button{flex:1 1 45%}
-  }
-  @media (max-width:520px){
-    table{min-width:560px}
-    th.col-ingredient{width:40%}
-    th.col-conversions{width:44%}
-    .controls button{flex:1 1 100%}
-  }
-  .empty-note{color:#777;padding:8px 6px;border-radius:6px;background:#fafafa;margin-top:8px}
+  .conv-copy{background:#eef;border:1px solid #dde;border-radius:6px;padding:4px 6px;cursor:pointer}
+  .removeBtn{background:#fff;color:#b33;border:1px solid #f3c7c7;padding:6px 8px;border-radius:8px}
+  input[type=text], input[type=number], select{padding:8px;border-radius:8px;border:1px solid #eee}
+  @media (max-width:720px){ table{min-width:640px} .controls button{flex:1 1 45%} }
+  @media (max-width:520px){ table{min-width:560px} .controls button{flex:1 1 100%} }
+
+  /* visible debug banner when JS init fails */
+  #debugBanner{ position: fixed; right: 18px; top: 18px; background: rgba(255,90,90,0.95); color: white; padding:8px 12px; border-radius:8px; z-index:9999; font-weight:700; display:none; }
+  #ing-empty {color:#777;padding:10px;border-radius:8px;background:#fafafa;margin-top:10px}
 </style>
 </head>
 <body>
+<div id="debugBanner" role="status" aria-live="polite"></div>
 <div class="app">
   <header>
     <div>
       <h1>Chef's Ingredient Converter</h1>
-      <p class="lead">Convert metric weights to US cups / tbsp / tsp. Use override names for copy/export.</p>
+      <div class="help">Convert metric weights → US cups / tbsp / tsp. Use override names for copy/export.</div>
     </div>
     <div class="pill">1 US cup = 236.588 ml</div>
   </header>
 
-  <div class="card" id="mainCard">
+  <div class="card">
     <div class="controls">
       <button id="addRowBtn">➕ Add Ingredient</button>
       <button id="copyTableBtn">📋 Copy All</button>
@@ -89,39 +58,37 @@
       <label style="color:var(--muted);font-size:0.95rem"><input id="autoConvertToggle" type="checkbox" checked> Auto-convert</label>
     </div>
 
-    <div class="table-wrapper">
-      <table id="convTable" aria-label="Ingredient conversions">
-        <thead>
-          <tr>
-            <th class="col-ingredient">Ingredient</th>
-            <th class="col-amount">Amount</th>
-            <th class="col-unit">Unit</th>
-            <th class="col-conversions">Conversions</th>
-            <th class="col-actions">Actions</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-    </div>
+    <div class="table-wrapper"><table id="convTable" aria-label="Ingredient conversions">
+      <thead>
+        <tr>
+          <th class="col-ingredient">Ingredient</th>
+          <th class="col-amount">Amount</th>
+          <th class="col-unit">Unit</th>
+          <th class="col-conversions">Conversions</th>
+          <th class="col-actions">Actions</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table></div>
 
-    <p class="help">Tip: Type a friendly override name that will show in copy/export. Add custom densities below.</p>
+    <div class="help">Tip: type an override name to label copies and exports. Add custom densities below.</div>
   </div>
 
-  <div class="card" id="managerCard">
-    <h3 style="margin:0 0 6px 0">Ingredient Manager</h3>
-    <div class="help">Add or edit ingredient densities (grams per US cup). Saved locally.</div>
+  <div class="card">
+    <h3 style="margin:0 0 8px 0">Ingredient Manager</h3>
+    <div class="help">Add/edit ingredient densities (grams per US cup). Data saved in your browser.</div>
 
-    <div style="display:flex;gap:8px;margin-top:10px;">
-      <input id="newIngName" type="text" placeholder="Ingredient name" style="flex:1;padding:8px;border-radius:8px;border:1px solid #ddd">
-      <input id="newIngDensity" type="number" placeholder="g per cup" style="width:140px;padding:8px;border-radius:8px;border:1px solid #ddd">
+    <div style="display:flex;gap:8px;margin-top:10px">
+      <input id="newIngName" type="text" placeholder="Ingredient name" style="flex:1" />
+      <input id="newIngDensity" type="number" placeholder="g per cup" style="width:140px" />
       <button id="addIngredientBtn">➕ Add</button>
     </div>
 
-    <div id="ingList" style="margin-top:12px;max-height:220px;overflow:auto"></div>
+    <div id="ingList" style="margin-top:12px;max-height:240px;overflow:auto"></div>
 
     <div style="display:flex;gap:8px;margin-top:12px">
       <button id="resetDefaults" class="secondary">Reset Defaults</button>
-      <button id="clearStorage" class="ghost">Clear Saved</button>
+      <button id="clearStorage" class="secondary" style="background:#fff;color:var(--brand);border:1px dashed #ddd">Clear Saved</button>
     </div>
 
     <div style="margin-top:10px"><strong>Saved ingredients:</strong> <span id="savedCount" style="color:var(--muted)"></span></div>
@@ -129,80 +96,81 @@
 </div>
 
 <script>
-/* Defensive single-file application */
-(() => {
-  /* ---------- constants ---------- */
+/* ---------- Defensive single-file app ---------- */
+
+(function(){
+  // Constants
   const DEFAULT_DENSITIES = {
-    "All-Purpose Flour": 120,
-    "Bread Flour": 125,
-    "Cake Flour": 110,
-    "Granulated Sugar": 200,
-    "Brown Sugar (packed)": 220,
-    "Powdered Sugar": 120,
-    "Kosher Salt": 145,
-    "Table Salt": 292,
-    "Baking Soda": 230,
-    "Baking Powder": 192,
-    "Instant Yeast": 150,
-    "Rice (uncooked)": 185,
-    "Quinoa (uncooked)": 170,
-    "Rolled Oats": 90,
-    "Cornmeal": 160
+    "All-Purpose Flour":120,"Bread Flour":125,"Cake Flour":110,"Granulated Sugar":200,
+    "Brown Sugar (packed)":220,"Powdered Sugar":120,"Kosher Salt":145,"Table Salt":292,
+    "Baking Soda":230,"Baking Powder":192,"Instant Yeast":150,"Rice (uncooked)":185,
+    "Quinoa (uncooked)":170,"Rolled Oats":90,"Cornmeal":160
   };
   const STORAGE_ING = 'chef_ing_densities_v1';
   const STORAGE_ROWS = 'chef_conv_rows_v1';
   const CUP_ML = 236.588;
   const METRIC_UNITS = [{value:'g',label:'g'},{value:'kg',label:'kg'},{value:'ml',label:'ml'},{value:'l',label:'l'}];
 
-  /* ---------- DOM refs (queried after DOMContentLoaded) ---------- */
-  let tbody, addRowBtn, copyTableBtn, exportCSVBtn, autoConvertToggle, ingListEl, savedCountEl, addIngredientBtn, newIngName, newIngDensity, resetDefaultsBtn, clearStorageBtn;
+  // DOM refs will be set in init()
+  let tbody, addRowBtn, copyTableBtn, exportCSVBtn, autoConvertToggle, ingListEl, savedCountEl, addIngredientBtn, newIngName, newIngDensity, resetDefaultsBtn, clearStorageBtn, debugBanner;
 
-  /* ---------- state ---------- */
+  // state
   let densities = {};
 
-  /* ---------- helpers ---------- */
-  function isPlainObject(x){ return x && typeof x === 'object' && !Array.isArray(x); }
+  // small helpers
+  function el(tag, props={}, ...children){
+    const n = document.createElement(tag);
+    for(const k in props){
+      if(k==='class') n.className = props[k];
+      else if(k==='html') n.innerHTML = props[k];
+      else n.setAttribute(k, props[k]);
+    }
+    for(const c of children) if(typeof c === 'string') n.appendChild(document.createTextNode(c)); else if(c) n.appendChild(c);
+    return n;
+  }
+
+  function showDebug(msg){
+    if(debugBanner){
+      debugBanner.textContent = msg;
+      debugBanner.style.display = 'block';
+    } else {
+      console.warn('DEBUG:', msg);
+    }
+  }
+
+  // defensive localStorage parsing
+  function safeParseJSON(raw){
+    try { return JSON.parse(raw); } catch(e){ return null; }
+  }
 
   function loadDensities(){
-    try {
+    try{
       const raw = localStorage.getItem(STORAGE_ING);
       if(!raw) return {...DEFAULT_DENSITIES};
-      const parsed = JSON.parse(raw);
-      if(!isPlainObject(parsed)){
-        // salvage: clear the stored bad value and return defaults
-        console.warn('Invalid densities stored; resetting to defaults.');
+      const parsed = safeParseJSON(raw);
+      if(!parsed || typeof parsed !== 'object' || Array.isArray(parsed)){
+        console.warn('Malformed densities in localStorage — clearing and using defaults.');
         localStorage.removeItem(STORAGE_ING);
         return {...DEFAULT_DENSITIES};
       }
-      // merge parsed over defaults so defaults remain available
       return {...DEFAULT_DENSITIES, ...parsed};
     } catch(e){
-      console.warn('Failed to load densities, using defaults.', e);
-      try { localStorage.removeItem(STORAGE_ING); } catch(_) {}
+      console.warn('loadDensities failed', e);
+      try { localStorage.removeItem(STORAGE_ING); } catch(_){}
       return {...DEFAULT_DENSITIES};
     }
   }
 
-  function saveDensities(){
-    try { localStorage.setItem(STORAGE_ING, JSON.stringify(densities)); } catch(e){ console.warn('saveDensities failed', e); }
-  }
+  function saveDensities(){ try { localStorage.setItem(STORAGE_ING, JSON.stringify(densities)); } catch(e){ console.warn('saveDensities', e); } }
 
   function loadRows(){
     try {
       const raw = localStorage.getItem(STORAGE_ROWS);
       if(!raw) return [];
-      const parsed = JSON.parse(raw);
-      if(!Array.isArray(parsed)) {
-        console.warn('Invalid saved rows; clearing.');
-        localStorage.removeItem(STORAGE_ROWS);
-        return [];
-      }
+      const parsed = safeParseJSON(raw);
+      if(!Array.isArray(parsed)){ localStorage.removeItem(STORAGE_ROWS); return []; }
       return parsed;
-    } catch(e){
-      console.warn('Failed to load rows', e);
-      try { localStorage.removeItem(STORAGE_ROWS); } catch(_) {}
-      return [];
-    }
+    } catch(e){ console.warn('loadRows', e); try{ localStorage.removeItem(STORAGE_ROWS); }catch(_){ } return []; }
   }
 
   function saveRows(){
@@ -214,30 +182,16 @@
         unit: tr.querySelector('.unit-select')?.value || ''
       }));
       localStorage.setItem(STORAGE_ROWS, JSON.stringify(rows));
-    } catch(e){
-      console.warn('saveRows failed', e);
-    }
+    } catch(e){ console.warn('saveRows', e); }
   }
 
-  function el(tag, props={}, ...children){
-    const n = document.createElement(tag);
-    for(const k in props){
-      if(k==='class') n.className = props[k];
-      else if(k==='html') n.innerHTML = props[k];
-      else n.setAttribute(k, props[k]);
-    }
-    children.forEach(c => { if(typeof c === 'string') n.appendChild(document.createTextNode(c)); else if(c) n.appendChild(c); });
-    return n;
-  }
-
-  /* ---------- UI pieces ---------- */
-
+  // UI builders
   function createIngredientSelect(value=''){
-    const s = el('select', {class:'ing-select', style:'width:100%;padding:6px;border-radius:6px;border:1px solid #eee'});
+    const s = el('select',{class:'ing-select', style:'width:100%;padding:8px;border-radius:8px;border:1px solid #eee'});
     s.appendChild(el('option',{value:''}, '— pick ingredient —'));
     const names = Object.keys(densities).sort((a,b)=>a.localeCompare(b));
     for(const n of names){
-      const o = el('option',{value:n}, n);
+      const o = el('option', {value:n}, n);
       if(n === value) o.selected = true;
       s.appendChild(o);
     }
@@ -248,9 +202,9 @@
   function addRow(pref={ingredient:'', override:'', amount:'', unit:'g'}, focus=true){
     const tr = document.createElement('tr');
 
-    // Ingredient (override input + select)
+    // Ingredient cell: override input + select
     const ingTd = el('td');
-    const overrideInput = el('input',{type:'text', placeholder:'Override name (optional)', class:'override-input', style:'width:100%;padding:6px;border-radius:6px;border:1px solid #eee'});
+    const overrideInput = el('input', {type:'text', class:'override-input', placeholder:'Override name (optional)', style:'width:100%;padding:8px;border-radius:8px;border:1px solid #eee'});
     overrideInput.value = pref.override || '';
     overrideInput.addEventListener('input', ()=> { if(autoConvertToggle.checked) convertRow(tr); });
 
@@ -261,7 +215,7 @@
 
     // Amount
     const amtTd = el('td');
-    const amtInput = el('input',{type:'number', step:'0.01', class:'amount-input', placeholder:'0', style:'width:100%;padding:6px;border-radius:6px;border:1px solid #eee'});
+    const amtInput = el('input', {type:'number', step:'0.01', class:'amount-input', placeholder:'0', style:'width:100%;padding:8px;border-radius:8px;border:1px solid #eee'});
     amtInput.value = pref.amount || '';
     amtInput.addEventListener('input', ()=> { if(autoConvertToggle.checked) convertRow(tr); });
     amtTd.appendChild(amtInput);
@@ -269,12 +223,8 @@
 
     // Unit
     const unitTd = el('td');
-    const unitSelect = el('select',{class:'unit-select', style:'width:100%;padding:6px;border-radius:6px;border:1px solid #eee'});
-    METRIC_UNITS.forEach(u => {
-      const o = el('option', {value:u.value}, u.label);
-      if(u.value === (pref.unit || 'g')) o.selected = true;
-      unitSelect.appendChild(o);
-    });
+    const unitSelect = el('select', {class:'unit-select', style:'width:100%;padding:8px;border-radius:8px;border:1px solid #eee'});
+    METRIC_UNITS.forEach(u => { const o = el('option',{value:u.value}, u.label); if(u.value === (pref.unit || 'g')) o.selected = true; unitSelect.appendChild(o); });
     unitSelect.addEventListener('change', ()=> { if(autoConvertToggle.checked) convertRow(tr); });
     unitTd.appendChild(unitSelect);
     tr.appendChild(unitTd);
@@ -283,24 +233,21 @@
     const convTd = el('td', {class:'conv-cell'}, '—');
     tr.appendChild(convTd);
 
-    // Actions (sticky)
+    // Actions - sticky column
     const actionsTd = el('td', {class:'actions'});
-    const convertBtn = el('button',{type:'button', class:'btn small'}, 'Convert');
+    const convertBtn = el('button', {type:'button'}, 'Convert');
     convertBtn.addEventListener('click', ()=> convertRow(tr));
-
-    const copyRowBtn = el('button',{type:'button', class:'btn small'}, 'Copy');
+    const copyRowBtn = el('button', {type:'button'}, 'Copy');
     copyRowBtn.addEventListener('click', ()=> copyRow(tr));
-
-    const removeBtn = el('button',{type:'button', class:'btn small removeBtn'}, 'Remove');
+    const removeBtn = el('button', {type:'button', class:'removeBtn'}, 'Remove');
     removeBtn.addEventListener('click', ()=> { tr.remove(); saveRows(); renderSavedCount(); });
 
-    const colWrap = el('div', {style:'display:flex;flex-direction:column;align-items:flex-end;gap:6px'});
-    colWrap.appendChild(convertBtn); colWrap.appendChild(copyRowBtn); colWrap.appendChild(removeBtn);
-    actionsTd.appendChild(colWrap);
+    const stack = el('div', {style:'display:flex;flex-direction:column;align-items:flex-end;gap:8px'});
+    stack.appendChild(convertBtn); stack.appendChild(copyRowBtn); stack.appendChild(removeBtn);
+    actionsTd.appendChild(stack);
     tr.appendChild(actionsTd);
 
     tbody.appendChild(tr);
-
     if(pref.ingredient && pref.amount) convertRow(tr);
     if(focus) overrideInput.focus();
     saveRows();
@@ -308,14 +255,7 @@
     return tr;
   }
 
-  function roundTo(num, dec){
-    const f = Math.pow(10, dec);
-    return (Math.round((num + Number.EPSILON) * f) / f).toFixed(dec);
-  }
-
-  function escapeForCopy(text){
-    return String(text).replace(/\s+/g,' ').trim();
-  }
+  function roundTo(n, d){ const f = Math.pow(10, d); return (Math.round((n + Number.EPSILON) * f) / f).toFixed(d); }
 
   function convertRow(tr){
     if(!tr) return;
@@ -325,20 +265,11 @@
     const unit = tr.querySelector('.unit-select')?.value;
     const convCell = tr.querySelector('.conv-cell');
 
-    if(!ingredient){
-      convCell.textContent = 'Pick ingredient';
-      return;
-    }
+    if(!ingredient){ convCell.textContent = 'Pick ingredient'; return; }
     const density = densities[ingredient];
-    if(!density){
-      convCell.textContent = 'Unknown density — add it below';
-      return;
-    }
+    if(!density){ convCell.textContent = 'Unknown density — add it below'; return; }
     const amount = parseFloat(amountStr);
-    if(isNaN(amount) || amount <= 0){
-      convCell.textContent = 'Enter amount';
-      return;
-    }
+    if(isNaN(amount) || amount <= 0){ convCell.textContent = 'Enter amount'; return; }
 
     let grams;
     if(unit === 'g') grams = amount;
@@ -354,41 +285,22 @@
     const cupsFmt = roundTo(cups, 3);
     const tbspFmt = roundTo(tbsp, 2);
     const tspFmt = roundTo(tsp, 2);
-    const displayName = overrideName || ingredient;
+    const display = (overrideName || ingredient).replace(/\s+/g,' ').trim();
 
     convCell.innerHTML = `
-      <div style="display:flex;flex-wrap:nowrap;align-items:center;gap:8px;">
-        <div class="conv-block"><button class="conv-copy" data-copy="${escapeForCopy(displayName)}\t${cupsFmt} cup(s)">📋</button><div>${cupsFmt} cup(s)</div></div>
-        <div class="conv-block"><button class="conv-copy" data-copy="${escapeForCopy(displayName)}\t${tbspFmt} tbsp">📋</button><div>${tbspFmt} tbsp</div></div>
-        <div class="conv-block"><button class="conv-copy" data-copy="${escapeForCopy(displayName)}\t${tspFmt} tsp">📋</button><div>${tspFmt} tsp</div></div>
-        <div style="margin-left:6px;color:#777">(${grams.toFixed(1)} g)</div>
-      </div>
-    `;
+      <div style="display:flex;flex-wrap:nowrap;align-items:center;gap:8px">
+        <div class="conv-block"><button class="conv-copy" data-copy="${display}\t${cupsFmt} cup(s)">📋</button><div>${cupsFmt} cup(s)</div></div>
+        <div class="conv-block"><button class="conv-copy" data-copy="${display}\t${tbspFmt} tbsp">📋</button><div>${tbspFmt} tbsp</div></div>
+        <div class="conv-block"><button class="conv-copy" data-copy="${display}\t${tspFmt} tsp">📋</button><div>${tspFmt} tsp</div></div>
+        <div style="color:#777;margin-left:6px">(${grams.toFixed(1)} g)</div>
+      </div>`;
     saveRows();
   }
 
   async function copyText(text){
-    try{
-      if(navigator.clipboard && navigator.clipboard.writeText){
-        await navigator.clipboard.writeText(text);
-        return true;
-      }
-    }catch(e){
-      console.warn('navigator.clipboard failed', e);
-    }
+    try{ if(navigator.clipboard && navigator.clipboard.writeText){ await navigator.clipboard.writeText(text); return true; } } catch(e){ console.warn('clipboard error', e); }
     // fallback
-    try{
-      const ta = document.createElement('textarea');
-      ta.value = text;
-      document.body.appendChild(ta);
-      ta.select();
-      document.execCommand('copy');
-      ta.remove();
-      return true;
-    }catch(e){
-      console.warn('fallback copy failed', e);
-      return false;
-    }
+    try{ const ta = document.createElement('textarea'); ta.value = text; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); return true; } catch(e){ console.warn('fallback copy error', e); return false; }
   }
 
   function rowToDisplayText(tr){
@@ -401,58 +313,40 @@
     return `${display}\t${amt} ${unit}\t${conv}`;
   }
 
-  function copyRow(tr){
-    const text = rowToDisplayText(tr);
-    copyText(text).then(ok => { if(ok) toast('Row copied'); else toast('Copy failed'); });
-  }
+  function copyRow(tr){ const txt = rowToDisplayText(tr); copyText(txt).then(ok => { if(ok) console.log('Row copied'); else console.warn('Row copy failed'); }); }
 
-  function toast(msg){
-    // simple alert replacement — non-blocking would be better but alert ok for now
-    // using console + tiny visual fallback
-    console.log('TOAST:', msg);
-    try { /* no-op placeholder */ } catch(e){}
-  }
-
-  /* conv-copy delegation */
+  // delegated handler for conversion copy buttons
   document.addEventListener('click', (ev) => {
     const btn = ev.target.closest && ev.target.closest('.conv-copy');
     if(btn && btn.dataset && btn.dataset.copy){
       copyText(btn.dataset.copy).then(ok => {
         const old = btn.textContent;
         if(ok){ btn.textContent = '✅'; setTimeout(()=> btn.textContent = old, 700); }
-        else toast('Copy failed');
       });
     }
   });
 
-  /* Ingredient manager rendering */
+  // Ingredient manager
   function renderIngredientList(){
     ingListEl.innerHTML = '';
     const names = Object.keys(densities).sort((a,b)=>a.localeCompare(b));
-    if(names.length === 0){
-      ingListEl.appendChild(el('div',{class:'empty-note'}, 'No ingredients saved. Add a name + density above.'));
-      return;
-    }
+    if(names.length === 0){ ingListEl.appendChild(el('div',{id:'ing-empty'}, 'No ingredients saved. Add one above.')); return; }
     for(const n of names){
-      const row = el('div',{style:'display:flex;gap:8px;align-items:center;margin-bottom:6px'});
+      const row = el('div', {style:'display:flex;gap:8px;align-items:center;margin-bottom:8px'});
       const nameSpan = el('div',{style:'flex:1;font-weight:600'}, n);
-      const densInput = el('input',{type:'number', value:densities[n], style:'width:100px;padding:6px;border-radius:6px;border:1px solid #eee'});
+      const densInput = el('input',{type:'number', value: densities[n], style:'width:120px;padding:8px;border-radius:8px;border:1px solid #eee'});
       densInput.addEventListener('change', (e) => {
         const v = parseFloat(e.target.value);
         if(!isNaN(v) && v > 0){ densities[n] = v; saveDensities(); if(autoConvertToggle.checked) for(const tr of tbody.querySelectorAll('tr')){ const sel = tr.querySelector('.ing-select'); if(sel && sel.value === n) convertRow(tr); } } else { e.target.value = densities[n]; alert('Density must be positive'); }
       });
-      const del = el('button',{class:'small removeBtn'}, 'Delete');
-      del.style.padding = '6px 8px';
+      const del = el('button',{class:'removeBtn'}, 'Delete');
       del.addEventListener('click', ()=> {
         if(!confirm(`Delete "${n}"?`)) return;
         delete densities[n];
         saveDensities();
         renderIngredientList();
         updateSelects();
-        for(const tr of tbody.querySelectorAll('tr')) {
-          const sel = tr.querySelector('.ing-select');
-          if(sel && sel.value === n){ sel.value = ''; tr.querySelector('.conv-cell').textContent = 'Unknown density'; }
-        }
+        for(const tr of tbody.querySelectorAll('tr')){ const sel = tr.querySelector('.ing-select'); if(sel && sel.value === n){ sel.value=''; tr.querySelector('.conv-cell').textContent='Unknown density'; } }
         saveRows();
       });
       row.appendChild(nameSpan); row.appendChild(densInput); row.appendChild(del);
@@ -461,22 +355,22 @@
     savedCountEl.textContent = `${Object.keys(densities).length} ingredients`;
   }
 
-  addIngredientBtn && addIngredientBtn.addEventListener && addIngredientBtn.addEventListener('click', ()=> {
-    const name = (newIngName && newIngName.value || '').trim();
-    const dens = parseFloat(newIngDensity && newIngDensity.value);
+  // add ingredient handler (called after DOM ready)
+  function handleAddIngredient(){
+    const name = (newIngName.value || '').trim();
+    const dens = parseFloat(newIngDensity.value);
     if(!name) return alert('Enter an ingredient name');
     if(isNaN(dens) || dens <= 0) return alert('Enter a valid density (g per cup)');
     densities[name] = dens;
     saveDensities();
-    newIngName.value = '';
-    newIngDensity.value = '';
+    newIngName.value = ''; newIngDensity.value = '';
     renderIngredientList();
     updateSelects();
-  });
+  }
 
   function updateSelects(){
     const names = Object.keys(densities).sort((a,b)=>a.localeCompare(b));
-    for(const sel of tbody.querySelectorAll('.ing-select')){
+    for(const sel of document.querySelectorAll('.ing-select')){
       const prev = sel.value;
       sel.innerHTML = '';
       sel.appendChild(el('option',{value:''}, '— pick ingredient —'));
@@ -484,28 +378,8 @@
     }
   }
 
-  /* reset & clear */
-  resetDefaultsBtn && resetDefaultsBtn.addEventListener && resetDefaultsBtn.addEventListener('click', ()=> {
-    if(!confirm('Reset to default ingredient densities?')) return;
-    densities = {...DEFAULT_DENSITIES};
-    saveDensities();
-    renderIngredientList();
-    updateSelects();
-  });
-
-  clearStorageBtn && clearStorageBtn.addEventListener && clearStorageBtn.addEventListener('click', ()=> {
-    if(!confirm('Clear saved densities and rows from localStorage?')) return;
-    try { localStorage.removeItem(STORAGE_ING); localStorage.removeItem(STORAGE_ROWS); } catch(e){ console.warn(e); }
-    densities = {...DEFAULT_DENSITIES};
-    tbody.innerHTML = '';
-    saveDensities();
-    renderIngredientList();
-    renderSavedCount();
-  });
-
   function renderSavedCount(){ savedCountEl.textContent = `${Object.keys(densities).length} ingredients`; }
 
-  /* hydrate saved rows */
   function hydrateRows(){
     const saved = loadRows();
     if(saved && saved.length){
@@ -515,14 +389,13 @@
     }
   }
 
-  /* main copy/export handlers */
-  function copyAllHandler(){
+  // copy all / export csv
+  function copyAll(){
     const rows = Array.from(tbody.querySelectorAll('tr')).map(rowToDisplayText);
-    const header = "Ingredient\tAmount\tConversions";
-    const text = [header, ...rows].join("\n");
-    copyText(text).then(ok => toast(ok ? 'Table copied' : 'Copy failed'));
+    const text = ['Ingredient\tAmount\tConversions', ...rows].join('\n');
+    copyText(text).then(ok => console.log(ok ? 'Table copied' : 'Table copy failed'));
   }
-  function exportCSVHandler(){
+  function exportCSV(){
     const rows = Array.from(tbody.querySelectorAll('tr')).map(tr => {
       const override = tr.querySelector('.override-input')?.value.trim();
       const ing = tr.querySelector('.ing-select')?.value || '';
@@ -538,88 +411,70 @@
     const a = document.createElement('a'); a.href = url; a.download = `ingredient_conversions_${new Date().toISOString().slice(0,10)}.csv`; a.click(); URL.revokeObjectURL(url);
   }
 
-  /* row display text */
-  function rowToDisplayText(tr){
-    const override = tr.querySelector('.override-input')?.value.trim();
-    const ing = tr.querySelector('.ing-select')?.value || '';
-    const display = override || ing || '(untitled)';
-    const amt = tr.querySelector('.amount-input')?.value || '';
-    const unit = tr.querySelector('.unit-select')?.value || '';
-    const conv = tr.querySelector('.conv-cell')?.textContent || '';
-    return `${display}\t${amt} ${unit}\t${conv}`;
-  }
-
-  /* event wiring after DOM loaded */
-  function attachEventHandlers(){
-    addRowBtn = document.getElementById('addRowBtn');
-    copyTableBtn = document.getElementById('copyTableBtn');
-    exportCSVBtn = document.getElementById('exportCSVBtn');
-    autoConvertToggle = document.getElementById('autoConvertToggle');
-    tbody = document.querySelector('#convTable tbody');
-    ingListEl = document.getElementById('ingList');
-    savedCountEl = document.getElementById('savedCount');
-    addIngredientBtn = document.getElementById('addIngredientBtn');
-    newIngName = document.getElementById('newIngName');
-    newIngDensity = document.getElementById('newIngDensity');
-    resetDefaultsBtn = document.getElementById('resetDefaults');
-    clearStorageBtn = document.getElementById('clearStorage');
-
-    addRowBtn && addRowBtn.addEventListener('click', ()=> addRow({ingredient:'',override:'',amount:'',unit:'g'}, true));
-    copyTableBtn && copyTableBtn.addEventListener('click', copyAllHandler);
-    exportCSVBtn && exportCSVBtn.addEventListener('click', exportCSVHandler);
-    autoConvertToggle && autoConvertToggle.addEventListener('change', ()=> { if(autoConvertToggle.checked) for(const tr of tbody.querySelectorAll('tr')) convertRow(tr); saveRows(); });
-
-    // add-ingredient handler (hook in the top-level add listener defined above)
-    addIngredientBtn = document.getElementById('addIngredientBtn');
-    newIngName = document.getElementById('newIngName');
-    newIngDensity = document.getElementById('newIngDensity');
-    addIngredientBtn && addIngredientBtn.addEventListener('click', () => {
-      const name = (newIngName.value || '').trim();
-      const dens = parseFloat(newIngDensity.value);
-      if(!name) return alert('Enter an ingredient name');
-      if(isNaN(dens) || dens <= 0) return alert('Enter a valid density (g per cup)');
-      densities[name] = dens; saveDensities(); newIngName.value=''; newIngDensity.value=''; renderIngredientList(); updateSelects();
-    });
-
-    // save rows debounce
-    tbody && tbody.addEventListener('input', ()=> {
-      if(window.__save_timer) clearTimeout(window.__save_timer);
-      window.__save_timer = setTimeout(()=> { saveRows(); window.__save_timer = null; }, 400);
-    });
-  }
-
-  /* init function */
+  // attach events and initialize; defensive wrapper with visible error banner on failure
   function init(){
-    // load densities from storage defensively
-    densities = loadDensities();
-    renderIngredientList();
-    hydrateRows();
-    updateSelects();
-    renderSavedCount();
-    attachEventHandlers();
-  }
+    try {
+      // DOM refs
+      tbody = document.querySelector('#convTable tbody');
+      addRowBtn = document.getElementById('addRowBtn');
+      copyTableBtn = document.getElementById('copyTableBtn');
+      exportCSVBtn = document.getElementById('exportCSVBtn');
+      autoConvertToggle = document.getElementById('autoConvertToggle');
+      ingListEl = document.getElementById('ingList');
+      savedCountEl = document.getElementById('savedCount');
+      addIngredientBtn = document.getElementById('addIngredientBtn');
+      newIngName = document.getElementById('newIngName');
+      newIngDensity = document.getElementById('newIngDensity');
+      resetDefaultsBtn = document.getElementById('resetDefaults');
+      clearStorageBtn = document.getElementById('clearStorage');
+      debugBanner = document.getElementById('debugBanner');
 
-  /* DOM ready */
-  if(document.readyState === 'loading'){
-    document.addEventListener('DOMContentLoaded', init);
-  } else {
-    init();
-  }
+      if(!tbody) throw new Error('Missing table body element (#convTable tbody).');
 
-  /* small utilities exposed (not global) */
-  function updateSelects(){
-    const names = Object.keys(densities).sort((a,b)=>a.localeCompare(b));
-    for(const sel of document.querySelectorAll('.ing-select')){
-      const prev = sel.value;
-      sel.innerHTML = '';
-      sel.appendChild(el('option',{value:''}, '— pick ingredient —'));
-      for(const n of names){
-        const o = el('option',{value:n}, n);
-        if(n === prev) o.selected = true;
-        sel.appendChild(o);
-      }
+      // load densities
+      densities = loadDensities();
+
+      // render UI
+      renderIngredientList();
+      hydrateRows();
+      updateSelects();
+      renderSavedCount();
+
+      // event wiring
+      addRowBtn && addRowBtn.addEventListener('click', ()=> addRow({ingredient:'',override:'',amount:'',unit:'g'}, true));
+      copyTableBtn && copyTableBtn.addEventListener('click', copyAll);
+      exportCSVBtn && exportCSVBtn.addEventListener('click', exportCSV);
+      autoConvertToggle && autoConvertToggle.addEventListener('change', ()=> { if(autoConvertToggle.checked) for(const tr of tbody.querySelectorAll('tr')) convertRow(tr); saveRows(); });
+
+      addIngredientBtn && addIngredientBtn.addEventListener('click', handleAddIngredient);
+
+      resetDefaultsBtn && resetDefaultsBtn.addEventListener('click', ()=> {
+        if(!confirm('Reset density list to defaults?')) return;
+        densities = {...DEFAULT_DENSITIES}; saveDensities(); renderIngredientList(); updateSelects(); renderSavedCount();
+      });
+
+      clearStorageBtn && clearStorageBtn.addEventListener('click', ()=> {
+        if(!confirm('Clear saved densities and rows?')) return;
+        try { localStorage.removeItem(STORAGE_ING); localStorage.removeItem(STORAGE_ROWS); } catch(e){ console.warn(e); }
+        densities = {...DEFAULT_DENSITIES}; tbody.innerHTML = ''; saveDensities(); renderIngredientList(); renderSavedCount();
+      });
+
+      // debounce saving rows on input
+      tbody && tbody.addEventListener('input', ()=> {
+        if(window.__save_timer) clearTimeout(window.__save_timer);
+        window.__save_timer = setTimeout(()=> { saveRows(); window.__save_timer=null; }, 400);
+      });
+
+      console.info('Chef Converter initialized successfully.');
+    } catch(err){
+      console.error('Initialization error:', err);
+      try { showDebug('App failed to initialize — see console for details'); } catch(e){}
     }
   }
+
+  // DOM ready
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
 
 })();
 </script>
