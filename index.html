@@ -12,56 +12,53 @@
     --card:#fff;
     --radius:10px;
     --gap:12px;
-    --actions-width:96px; /* width of the sticky actions column */
+    --actions-width:100px;
   }
   *{box-sizing:border-box}
   body{
     margin:0;
-    font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial;
     background:var(--bg);
     color:#222;
     padding:18px;
   }
-  .app{max-width:1100px; margin:0 auto;}
+  .app{max-width:1100px;margin:0 auto}
   header{display:flex;gap:12px;align-items:center;justify-content:space-between;margin-bottom:12px}
-  h1{margin:0;color:var(--brand);font-size:1.4rem}
+  h1{margin:0;color:var(--brand);font-size:1.5rem}
   p.lead{margin:0;color:var(--muted);font-size:0.95rem}
-  .pill{background:#fff;padding:6px 10px;border-radius:999px;border:1px solid #eee;color:var(--brand);font-weight:600}
-  .card{background:var(--card); border-radius:10px; padding:14px; box-shadow:0 6px 20px rgba(20,20,30,0.04); margin-bottom:14px}
+  .pill{background:#fff;padding:6px 12px;border-radius:999px;border:1px solid #eee;color:var(--brand);font-weight:600}
+  .card{background:var(--card);border-radius:10px;padding:14px;box-shadow:0 6px 20px rgba(20,20,30,0.04);margin-bottom:14px}
   .controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
   button{background:var(--brand);color:#fff;border:0;padding:8px 10px;border-radius:8px;cursor:pointer}
   button.secondary{background:#fff;color:var(--brand);border:1px solid #ddd}
   button.ghost{background:transparent;color:var(--brand);border:1px dashed #ddd}
   .help{color:var(--muted);font-size:0.9rem;margin-top:8px}
-  .table-wrapper{ overflow:auto; position:relative; padding-right: calc(var(--actions-width) + 12px); /* reserve space for sticky actions */ }
-  table{width:100%; border-collapse:collapse; min-width:760px; table-layout:fixed;}
+  .table-wrapper{ overflow:auto; position:relative; padding-right: calc(var(--actions-width) + 12px); }
+  table{width:100%; border-collapse:collapse; min-width:720px; table-layout:fixed;}
   thead th{background:var(--brand); color:#fff; padding:12px 10px; font-weight:600; text-align:left; font-size:0.95rem}
   tbody td{padding:10px 8px; border-bottom:1px solid #eee; font-size:0.92rem; vertical-align:middle; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
-  /* column sizing */
-  th.col-ingredient{width:32%}
+  th.col-ingredient{width:34%}
   th.col-amount{width:12%}
   th.col-unit{width:12%}
-  th.col-conversions{width:44%}
-  th.col-actions, td.actions{ width:var(--actions-width); min-width:var(--actions-width); max-width:var(--actions-width); text-align:right; vertical-align:middle}
-  /* sticky actions */
+  th.col-conversions{width:42%}
+  th.col-actions, td.actions{ width:var(--actions-width); min-width:var(--actions-width); max-width:var(--actions-width); text-align:right; vertical-align:middle }
   th.col-actions, td.actions {
     position: -webkit-sticky;
     position: sticky;
     right: 0;
     background: linear-gradient(0deg,#fff,#fff);
-    box-shadow: -10px 0 8px rgba(0,0,0,0.04);
+    box-shadow: -8px 0 8px rgba(0,0,0,0.03);
     z-index: 5;
   }
-  .conv-block{display:inline-flex; align-items:center; gap:8px; background:#fafafa; padding:6px 8px; border-radius:8px; margin-right:6px}
+  .conv-block{display:inline-flex;align-items:center;gap:8px;background:#fafafa;padding:6px 8px;border-radius:8px;margin-right:6px}
   .conv-copy{background:#eef;border:1px solid #dde;border-radius:6px;padding:4px 6px;cursor:pointer;font-size:0.9rem}
   .actions .btn{display:inline-block;margin-left:6px;padding:6px 8px;border-radius:8px;border:0;cursor:pointer}
   .small{font-size:0.9rem;padding:6px 8px;border-radius:6px}
   .removeBtn{background:#fff;color:#b33;border:1px solid #f3c7c7}
-  /* responsive tweaks */
   @media (max-width:720px){
     table{min-width:640px}
     th.col-ingredient{width:36%}
-    th.col-conversions{width:46%}
+    th.col-conversions{width:44%}
     .controls button{flex:1 1 45%}
   }
   @media (max-width:520px){
@@ -70,6 +67,7 @@
     th.col-conversions{width:44%}
     .controls button{flex:1 1 100%}
   }
+  .empty-note{color:#777;padding:8px 6px;border-radius:6px;background:#fafafa;margin-top:8px}
 </style>
 </head>
 <body>
@@ -77,7 +75,7 @@
   <header>
     <div>
       <h1>Chef's Ingredient Converter</h1>
-      <p class="lead">Convert metric weights to US cups / tbsp / tsp. Override names used for copy/export.</p>
+      <p class="lead">Convert metric weights to US cups / tbsp / tsp. Use override names for copy/export.</p>
     </div>
     <div class="pill">1 US cup = 236.588 ml</div>
   </header>
@@ -88,10 +86,10 @@
       <button id="copyTableBtn">📋 Copy All</button>
       <button id="exportCSVBtn">💾 Export CSV</button>
       <div style="flex:1"></div>
-      <label style="color:var(--muted); font-size:0.95rem"><input id="autoConvertToggle" type="checkbox" checked> Auto-convert</label>
+      <label style="color:var(--muted);font-size:0.95rem"><input id="autoConvertToggle" type="checkbox" checked> Auto-convert</label>
     </div>
 
-    <div class="table-wrapper" id="tableWrapper">
+    <div class="table-wrapper">
       <table id="convTable" aria-label="Ingredient conversions">
         <thead>
           <tr>
@@ -106,324 +104,524 @@
       </table>
     </div>
 
-    <p class="help">Tip: Type an override name (used in copy/export). Add custom densities below.</p>
+    <p class="help">Tip: Type a friendly override name that will show in copy/export. Add custom densities below.</p>
   </div>
 
   <div class="card" id="managerCard">
     <h3 style="margin:0 0 6px 0">Ingredient Manager</h3>
-    <div class="help">Add/edit densities (grams per US cup). Saved locally in your browser.</div>
+    <div class="help">Add or edit ingredient densities (grams per US cup). Saved locally.</div>
+
     <div style="display:flex;gap:8px;margin-top:10px;">
       <input id="newIngName" type="text" placeholder="Ingredient name" style="flex:1;padding:8px;border-radius:8px;border:1px solid #ddd">
       <input id="newIngDensity" type="number" placeholder="g per cup" style="width:140px;padding:8px;border-radius:8px;border:1px solid #ddd">
       <button id="addIngredientBtn">➕ Add</button>
     </div>
+
     <div id="ingList" style="margin-top:12px;max-height:220px;overflow:auto"></div>
+
     <div style="display:flex;gap:8px;margin-top:12px">
       <button id="resetDefaults" class="secondary">Reset Defaults</button>
       <button id="clearStorage" class="ghost">Clear Saved</button>
     </div>
+
     <div style="margin-top:10px"><strong>Saved ingredients:</strong> <span id="savedCount" style="color:var(--muted)"></span></div>
   </div>
 </div>
 
 <script>
-/* Robust single-file app JS - same core features (rows, densities, persistence, convert, copy, CSV) */
+/* Defensive single-file application */
+(() => {
+  /* ---------- constants ---------- */
+  const DEFAULT_DENSITIES = {
+    "All-Purpose Flour": 120,
+    "Bread Flour": 125,
+    "Cake Flour": 110,
+    "Granulated Sugar": 200,
+    "Brown Sugar (packed)": 220,
+    "Powdered Sugar": 120,
+    "Kosher Salt": 145,
+    "Table Salt": 292,
+    "Baking Soda": 230,
+    "Baking Powder": 192,
+    "Instant Yeast": 150,
+    "Rice (uncooked)": 185,
+    "Quinoa (uncooked)": 170,
+    "Rolled Oats": 90,
+    "Cornmeal": 160
+  };
+  const STORAGE_ING = 'chef_ing_densities_v1';
+  const STORAGE_ROWS = 'chef_conv_rows_v1';
+  const CUP_ML = 236.588;
+  const METRIC_UNITS = [{value:'g',label:'g'},{value:'kg',label:'kg'},{value:'ml',label:'ml'},{value:'l',label:'l'}];
 
-/* Defaults */
-const DEFAULT_DENSITIES = {
-  "All-Purpose Flour": 120,
-  "Bread Flour": 125,
-  "Cake Flour": 110,
-  "Granulated Sugar": 200,
-  "Brown Sugar (packed)": 220,
-  "Powdered Sugar": 120,
-  "Kosher Salt": 145,
-  "Table Salt": 292,
-  "Baking Soda": 230,
-  "Baking Powder": 192,
-  "Instant Yeast": 150,
-  "Rice (uncooked)": 185,
-  "Quinoa (uncooked)": 170,
-  "Rolled Oats": 90,
-  "Cornmeal": 160
-};
-const STORAGE_ING = 'chef_ing_densities_v1';
-const STORAGE_ROWS = 'chef_conv_rows_v1';
-const CUP_ML = 236.588;
-const METRIC_UNITS = [{value:'g',label:'g'},{value:'kg',label:'kg'},{value:'ml',label:'ml'},{value:'l',label:'l'}];
+  /* ---------- DOM refs (queried after DOMContentLoaded) ---------- */
+  let tbody, addRowBtn, copyTableBtn, exportCSVBtn, autoConvertToggle, ingListEl, savedCountEl, addIngredientBtn, newIngName, newIngDensity, resetDefaultsBtn, clearStorageBtn;
 
-/* DOM */
-const tbody = document.querySelector('#convTable tbody');
-const addRowBtn = document.getElementById('addRowBtn');
-const copyTableBtn = document.getElementById('copyTableBtn');
-const exportCSVBtn = document.getElementById('exportCSVBtn');
-const autoConvertToggle = document.getElementById('autoConvertToggle');
-const ingListEl = document.getElementById('ingList');
-const savedCountEl = document.getElementById('savedCount');
-const addIngredientBtn = document.getElementById('addIngredientBtn');
-const newIngName = document.getElementById('newIngName');
-const newIngDensity = document.getElementById('newIngDensity');
-const resetDefaultsBtn = document.getElementById('resetDefaults');
-const clearStorageBtn = document.getElementById('clearStorage');
+  /* ---------- state ---------- */
+  let densities = {};
 
-/* State */
-let densities = loadDensities();
+  /* ---------- helpers ---------- */
+  function isPlainObject(x){ return x && typeof x === 'object' && !Array.isArray(x); }
 
-/* Utilities */
-function loadDensities(){
-  try{
-    const raw = localStorage.getItem(STORAGE_ING);
-    if(raw) return {...DEFAULT_DENSITIES, ...JSON.parse(raw)};
-  }catch(e){ console.warn('loadDensities', e); }
-  return {...DEFAULT_DENSITIES};
-}
-function saveDensities(){ try{ localStorage.setItem(STORAGE_ING, JSON.stringify(densities)); }catch(e){console.warn('saveDensities', e);} }
-function loadRows(){ try{ const raw = localStorage.getItem(STORAGE_ROWS); if(raw) return JSON.parse(raw);}catch(e){console.warn('loadRows', e);} return []; }
-function saveRows(){ try{ const rows = Array.from(tbody.querySelectorAll('tr')).map(tr => ({ ingredient: tr.querySelector('.ing-select')?.value||'', override: tr.querySelector('.override-input')?.value||'', amount: tr.querySelector('.amount-input')?.value||'', unit: tr.querySelector('.unit-select')?.value||'' })); localStorage.setItem(STORAGE_ROWS, JSON.stringify(rows)); }catch(e){console.warn('saveRows', e);} }
-
-/* element helper */
-function el(tag, props={}, ...children){
-  const n = document.createElement(tag);
-  for(const k in props){
-    if(k==='class') n.className = props[k];
-    else if(k==='html') n.innerHTML = props[k];
-    else n.setAttribute(k, props[k]);
+  function loadDensities(){
+    try {
+      const raw = localStorage.getItem(STORAGE_ING);
+      if(!raw) return {...DEFAULT_DENSITIES};
+      const parsed = JSON.parse(raw);
+      if(!isPlainObject(parsed)){
+        // salvage: clear the stored bad value and return defaults
+        console.warn('Invalid densities stored; resetting to defaults.');
+        localStorage.removeItem(STORAGE_ING);
+        return {...DEFAULT_DENSITIES};
+      }
+      // merge parsed over defaults so defaults remain available
+      return {...DEFAULT_DENSITIES, ...parsed};
+    } catch(e){
+      console.warn('Failed to load densities, using defaults.', e);
+      try { localStorage.removeItem(STORAGE_ING); } catch(_) {}
+      return {...DEFAULT_DENSITIES};
+    }
   }
-  children.forEach(c => { if(typeof c === 'string') n.appendChild(document.createTextNode(c)); else if(c) n.appendChild(c); });
-  return n;
-}
 
-/* Ingredient select */
-function createIngredientSelect(value=''){
-  const s = el('select',{class:'ing-select'});
-  s.appendChild(el('option',{value:''}, '— pick ingredient —'));
-  const names = Object.keys(densities).sort((a,b)=>a.localeCompare(b));
-  for(const n of names){
-    const o = el('option',{value:n}, n);
-    if(n===value) o.selected=true;
-    s.appendChild(o);
+  function saveDensities(){
+    try { localStorage.setItem(STORAGE_ING, JSON.stringify(densities)); } catch(e){ console.warn('saveDensities failed', e); }
   }
-  s.addEventListener('change', ()=>{ const tr = s.closest('tr'); if(tr && autoConvertToggle.checked) convertRow(tr); });
-  return s;
-}
 
-/* add a row */
-function addRow(pref={ingredient:'',override:'',amount:'',unit:'g'}, focus=true){
-  const tr = document.createElement('tr');
+  function loadRows(){
+    try {
+      const raw = localStorage.getItem(STORAGE_ROWS);
+      if(!raw) return [];
+      const parsed = JSON.parse(raw);
+      if(!Array.isArray(parsed)) {
+        console.warn('Invalid saved rows; clearing.');
+        localStorage.removeItem(STORAGE_ROWS);
+        return [];
+      }
+      return parsed;
+    } catch(e){
+      console.warn('Failed to load rows', e);
+      try { localStorage.removeItem(STORAGE_ROWS); } catch(_) {}
+      return [];
+    }
+  }
 
-  // ingredient + override
-  const ingTd = el('td');
-  const overrideInput = el('input',{type:'text',placeholder:'Override name (optional)',class:'override-input',style:'width:100%;padding:6px;border-radius:6px;border:1px solid #eee'});
-  overrideInput.value = pref.override||'';
-  overrideInput.addEventListener('input', ()=>{ if(autoConvertToggle.checked) convertRow(tr); });
+  function saveRows(){
+    try {
+      const rows = Array.from(tbody.querySelectorAll('tr')).map(tr => ({
+        ingredient: tr.querySelector('.ing-select')?.value || '',
+        override: tr.querySelector('.override-input')?.value || '',
+        amount: tr.querySelector('.amount-input')?.value || '',
+        unit: tr.querySelector('.unit-select')?.value || ''
+      }));
+      localStorage.setItem(STORAGE_ROWS, JSON.stringify(rows));
+    } catch(e){
+      console.warn('saveRows failed', e);
+    }
+  }
 
-  const ingSelect = createIngredientSelect(pref.ingredient||'');
-  ingTd.appendChild(overrideInput);
-  ingTd.appendChild(ingSelect);
-  tr.appendChild(ingTd);
+  function el(tag, props={}, ...children){
+    const n = document.createElement(tag);
+    for(const k in props){
+      if(k==='class') n.className = props[k];
+      else if(k==='html') n.innerHTML = props[k];
+      else n.setAttribute(k, props[k]);
+    }
+    children.forEach(c => { if(typeof c === 'string') n.appendChild(document.createTextNode(c)); else if(c) n.appendChild(c); });
+    return n;
+  }
 
-  // amount
-  const amtTd = el('td');
-  const amtInput = el('input',{type:'number',step:'0.01',class:'amount-input',placeholder:'0',style:'width:100%;padding:6px;border-radius:6px;border:1px solid #eee'});
-  amtInput.value = pref.amount||'';
-  amtInput.addEventListener('input', ()=>{ if(autoConvertToggle.checked) convertRow(tr); });
-  amtTd.appendChild(amtInput);
-  tr.appendChild(amtTd);
+  /* ---------- UI pieces ---------- */
 
-  // unit
-  const unitTd = el('td');
-  const unitSelect = el('select',{class:'unit-select', style:'width:100%;padding:6px;border-radius:6px;border:1px solid #eee'});
-  METRIC_UNITS.forEach(u => { const o = el('option',{value:u.value}, u.label); if(u.value === (pref.unit||'g')) o.selected = true; unitSelect.appendChild(o); });
-  unitSelect.addEventListener('change', ()=>{ if(autoConvertToggle.checked) convertRow(tr); });
-  unitTd.appendChild(unitSelect);
-  tr.appendChild(unitTd);
+  function createIngredientSelect(value=''){
+    const s = el('select', {class:'ing-select', style:'width:100%;padding:6px;border-radius:6px;border:1px solid #eee'});
+    s.appendChild(el('option',{value:''}, '— pick ingredient —'));
+    const names = Object.keys(densities).sort((a,b)=>a.localeCompare(b));
+    for(const n of names){
+      const o = el('option',{value:n}, n);
+      if(n === value) o.selected = true;
+      s.appendChild(o);
+    }
+    s.addEventListener('change', ()=> { const tr = s.closest('tr'); if(tr && autoConvertToggle.checked) convertRow(tr); });
+    return s;
+  }
 
-  // conversions
-  const convTd = el('td',{class:'conv-cell'}, '—');
-  tr.appendChild(convTd);
+  function addRow(pref={ingredient:'', override:'', amount:'', unit:'g'}, focus=true){
+    const tr = document.createElement('tr');
 
-  // actions (sticky column)
-  const actionsTd = el('td',{class:'actions'});
-  const convertBtn = el('button',{type:'button',class:'btn small'}, 'Convert');
-  convertBtn.addEventListener('click', ()=> convertRow(tr));
-  const copyRowBtn = el('button',{type:'button',class:'btn small'}, 'Copy');
-  copyRowBtn.addEventListener('click', ()=> copyRow(tr));
-  const removeBtn = el('button',{type:'button',class:'btn small removeBtn'}, 'Remove');
-  removeBtn.addEventListener('click', ()=> { tr.remove(); saveRows(); renderSavedCount(); });
+    // Ingredient (override input + select)
+    const ingTd = el('td');
+    const overrideInput = el('input',{type:'text', placeholder:'Override name (optional)', class:'override-input', style:'width:100%;padding:6px;border-radius:6px;border:1px solid #eee'});
+    overrideInput.value = pref.override || '';
+    overrideInput.addEventListener('input', ()=> { if(autoConvertToggle.checked) convertRow(tr); });
 
-  // style actions compactly (stack)
-  const wrap = el('div', {style:'display:flex;flex-direction:column;align-items:flex-end;gap:6px;'});
-  wrap.appendChild(convertBtn); wrap.appendChild(copyRowBtn); wrap.appendChild(removeBtn);
-  actionsTd.appendChild(wrap);
-  tr.appendChild(actionsTd);
+    const ingSelect = createIngredientSelect(pref.ingredient || '');
+    ingTd.appendChild(overrideInput);
+    ingTd.appendChild(ingSelect);
+    tr.appendChild(ingTd);
 
-  tbody.appendChild(tr);
+    // Amount
+    const amtTd = el('td');
+    const amtInput = el('input',{type:'number', step:'0.01', class:'amount-input', placeholder:'0', style:'width:100%;padding:6px;border-radius:6px;border:1px solid #eee'});
+    amtInput.value = pref.amount || '';
+    amtInput.addEventListener('input', ()=> { if(autoConvertToggle.checked) convertRow(tr); });
+    amtTd.appendChild(amtInput);
+    tr.appendChild(amtTd);
 
-  if(pref.ingredient && pref.amount) convertRow(tr);
-  if(focus) overrideInput.focus();
-  saveRows();
-  renderSavedCount();
-  return tr;
-}
+    // Unit
+    const unitTd = el('td');
+    const unitSelect = el('select',{class:'unit-select', style:'width:100%;padding:6px;border-radius:6px;border:1px solid #eee'});
+    METRIC_UNITS.forEach(u => {
+      const o = el('option', {value:u.value}, u.label);
+      if(u.value === (pref.unit || 'g')) o.selected = true;
+      unitSelect.appendChild(o);
+    });
+    unitSelect.addEventListener('change', ()=> { if(autoConvertToggle.checked) convertRow(tr); });
+    unitTd.appendChild(unitSelect);
+    tr.appendChild(unitTd);
 
-/* conversion math & render */
-function roundTo(num,dec){ const f=Math.pow(10,dec); return (Math.round((num+Number.EPSILON)*f)/f).toFixed(dec); }
-function convertRow(tr){
-  if(!tr) return;
-  const overrideName = tr.querySelector('.override-input')?.value.trim();
-  const ingredient = tr.querySelector('.ing-select')?.value || '';
-  const amountStr = tr.querySelector('.amount-input')?.value;
-  const unit = tr.querySelector('.unit-select')?.value;
-  const convCell = tr.querySelector('.conv-cell');
+    // Conversions
+    const convTd = el('td', {class:'conv-cell'}, '—');
+    tr.appendChild(convTd);
 
-  if(!ingredient){ convCell.textContent = 'Pick ingredient'; return; }
-  const density = densities[ingredient];
-  if(!density){ convCell.textContent = 'Unknown density — add it below'; return; }
-  const amount = parseFloat(amountStr);
-  if(isNaN(amount) || amount <= 0){ convCell.textContent = 'Enter amount'; return; }
+    // Actions (sticky)
+    const actionsTd = el('td', {class:'actions'});
+    const convertBtn = el('button',{type:'button', class:'btn small'}, 'Convert');
+    convertBtn.addEventListener('click', ()=> convertRow(tr));
 
-  let grams;
-  if(unit === 'g') grams = amount;
-  else if(unit === 'kg') grams = amount * 1000;
-  else if(unit === 'ml') grams = amount * (density / CUP_ML);
-  else if(unit === 'l') grams = (amount * 1000) * (density / CUP_ML);
-  else grams = amount;
+    const copyRowBtn = el('button',{type:'button', class:'btn small'}, 'Copy');
+    copyRowBtn.addEventListener('click', ()=> copyRow(tr));
 
-  const cups = grams / density;
-  const tbsp = cups * 16;
-  const tsp = tbsp * 3;
+    const removeBtn = el('button',{type:'button', class:'btn small removeBtn'}, 'Remove');
+    removeBtn.addEventListener('click', ()=> { tr.remove(); saveRows(); renderSavedCount(); });
 
-  const cupsFmt = roundTo(cups,3);
-  const tbspFmt = roundTo(tbsp,2);
-  const tspFmt = roundTo(tsp,2);
-  const displayName = overrideName || ingredient;
+    const colWrap = el('div', {style:'display:flex;flex-direction:column;align-items:flex-end;gap:6px'});
+    colWrap.appendChild(convertBtn); colWrap.appendChild(copyRowBtn); colWrap.appendChild(removeBtn);
+    actionsTd.appendChild(colWrap);
+    tr.appendChild(actionsTd);
 
-  convCell.innerHTML = `
-    <div style="display:flex;flex-wrap:nowrap;align-items:center;gap:8px;">
-      <div class="conv-block"><button class="conv-copy" data-copy="${escape(displayName)}\t${cupsFmt} cup(s)">📋</button><div>${cupsFmt} cup(s)</div></div>
-      <div class="conv-block"><button class="conv-copy" data-copy="${escape(displayName)}\t${tbspFmt} tbsp">📋</button><div>${tbspFmt} tbsp</div></div>
-      <div class="conv-block"><button class="conv-copy" data-copy="${escape(displayName)}\t${tspFmt} tsp">📋</button><div>${tspFmt} tsp</div></div>
-      <div style="margin-left:6px;color:#777">(${grams.toFixed(1)} g)</div>
-    </div>
-  `;
-  saveRows();
-}
+    tbody.appendChild(tr);
 
-/* clipboard helper with fallback */
-async function copyText(text){
-  try{ if(navigator.clipboard && navigator.clipboard.writeText){ await navigator.clipboard.writeText(text); return true; } }catch(e){ console.warn('clipboard',e); }
-  try{ const ta = document.createElement('textarea'); ta.value = text; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); return true; }catch(e){ console.warn('fallback copy', e); return false; }
-}
-function rowToDisplayText(tr){
-  const override = tr.querySelector('.override-input')?.value.trim();
-  const ing = tr.querySelector('.ing-select')?.value || '';
-  const display = override || ing || '(untitled)';
-  const amt = tr.querySelector('.amount-input')?.value || '';
-  const unit = tr.querySelector('.unit-select')?.value || '';
-  const conv = tr.querySelector('.conv-cell')?.textContent || '';
-  return `${display}\t${amt} ${unit}\t${conv}`;
-}
-function copyRow(tr){ const text = rowToDisplayText(tr); copyText(text).then(ok => { if(ok) flashAlert('Row copied'); else flashAlert('Copy failed'); }); }
+    if(pref.ingredient && pref.amount) convertRow(tr);
+    if(focus) overrideInput.focus();
+    saveRows();
+    renderSavedCount();
+    return tr;
+  }
 
-/* table-level copy/export */
-copyTableBtn.addEventListener('click', async ()=>{
-  const rows = Array.from(tbody.querySelectorAll('tr')).map(rowToDisplayText);
-  const header = "Ingredient\tAmount\tConversions";
-  const text = [header, ...rows].join("\n");
-  const ok = await copyText(text);
-  flashAlert(ok ? 'Table copied' : 'Copy failed');
-});
-exportCSVBtn.addEventListener('click', ()=>{
-  const rows = Array.from(tbody.querySelectorAll('tr')).map(tr => {
+  function roundTo(num, dec){
+    const f = Math.pow(10, dec);
+    return (Math.round((num + Number.EPSILON) * f) / f).toFixed(dec);
+  }
+
+  function escapeForCopy(text){
+    return String(text).replace(/\s+/g,' ').trim();
+  }
+
+  function convertRow(tr){
+    if(!tr) return;
+    const overrideName = tr.querySelector('.override-input')?.value.trim();
+    const ingredient = tr.querySelector('.ing-select')?.value || '';
+    const amountStr = tr.querySelector('.amount-input')?.value;
+    const unit = tr.querySelector('.unit-select')?.value;
+    const convCell = tr.querySelector('.conv-cell');
+
+    if(!ingredient){
+      convCell.textContent = 'Pick ingredient';
+      return;
+    }
+    const density = densities[ingredient];
+    if(!density){
+      convCell.textContent = 'Unknown density — add it below';
+      return;
+    }
+    const amount = parseFloat(amountStr);
+    if(isNaN(amount) || amount <= 0){
+      convCell.textContent = 'Enter amount';
+      return;
+    }
+
+    let grams;
+    if(unit === 'g') grams = amount;
+    else if(unit === 'kg') grams = amount * 1000;
+    else if(unit === 'ml') grams = amount * (density / CUP_ML);
+    else if(unit === 'l') grams = (amount * 1000) * (density / CUP_ML);
+    else grams = amount;
+
+    const cups = grams / density;
+    const tbsp = cups * 16;
+    const tsp = tbsp * 3;
+
+    const cupsFmt = roundTo(cups, 3);
+    const tbspFmt = roundTo(tbsp, 2);
+    const tspFmt = roundTo(tsp, 2);
+    const displayName = overrideName || ingredient;
+
+    convCell.innerHTML = `
+      <div style="display:flex;flex-wrap:nowrap;align-items:center;gap:8px;">
+        <div class="conv-block"><button class="conv-copy" data-copy="${escapeForCopy(displayName)}\t${cupsFmt} cup(s)">📋</button><div>${cupsFmt} cup(s)</div></div>
+        <div class="conv-block"><button class="conv-copy" data-copy="${escapeForCopy(displayName)}\t${tbspFmt} tbsp">📋</button><div>${tbspFmt} tbsp</div></div>
+        <div class="conv-block"><button class="conv-copy" data-copy="${escapeForCopy(displayName)}\t${tspFmt} tsp">📋</button><div>${tspFmt} tsp</div></div>
+        <div style="margin-left:6px;color:#777">(${grams.toFixed(1)} g)</div>
+      </div>
+    `;
+    saveRows();
+  }
+
+  async function copyText(text){
+    try{
+      if(navigator.clipboard && navigator.clipboard.writeText){
+        await navigator.clipboard.writeText(text);
+        return true;
+      }
+    }catch(e){
+      console.warn('navigator.clipboard failed', e);
+    }
+    // fallback
+    try{
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      ta.remove();
+      return true;
+    }catch(e){
+      console.warn('fallback copy failed', e);
+      return false;
+    }
+  }
+
+  function rowToDisplayText(tr){
     const override = tr.querySelector('.override-input')?.value.trim();
     const ing = tr.querySelector('.ing-select')?.value || '';
-    const display = override || ing || '';
+    const display = override || ing || '(untitled)';
     const amt = tr.querySelector('.amount-input')?.value || '';
     const unit = tr.querySelector('.unit-select')?.value || '';
     const conv = tr.querySelector('.conv-cell')?.textContent || '';
-    return [display, amt, unit, conv].map(s => `"${String(s).replace(/"/g,'""')}"`).join(',');
+    return `${display}\t${amt} ${unit}\t${conv}`;
+  }
+
+  function copyRow(tr){
+    const text = rowToDisplayText(tr);
+    copyText(text).then(ok => { if(ok) toast('Row copied'); else toast('Copy failed'); });
+  }
+
+  function toast(msg){
+    // simple alert replacement — non-blocking would be better but alert ok for now
+    // using console + tiny visual fallback
+    console.log('TOAST:', msg);
+    try { /* no-op placeholder */ } catch(e){}
+  }
+
+  /* conv-copy delegation */
+  document.addEventListener('click', (ev) => {
+    const btn = ev.target.closest && ev.target.closest('.conv-copy');
+    if(btn && btn.dataset && btn.dataset.copy){
+      copyText(btn.dataset.copy).then(ok => {
+        const old = btn.textContent;
+        if(ok){ btn.textContent = '✅'; setTimeout(()=> btn.textContent = old, 700); }
+        else toast('Copy failed');
+      });
+    }
   });
-  const csv = ['"Ingredient","Amount","Unit","Conversions"', ...rows].join('\n');
-  const blob = new Blob([csv], {type:'text/csv'}); const url = URL.createObjectURL(blob);
-  const a = document.createElement('a'); a.href = url; a.download = `ingredient_conversions_${new Date().toISOString().slice(0,10)}.csv`; a.click(); URL.revokeObjectURL(url);
-});
 
-/* conv-copy delegated clicks */
-document.addEventListener('click', (ev)=>{
-  const btn = ev.target.closest('.conv-copy');
-  if(btn && btn.dataset && btn.dataset.copy){
-    copyText(btn.dataset.copy).then(ok => {
-      const old = btn.textContent;
-      if(ok){ btn.textContent = '✅'; setTimeout(()=> btn.textContent = old, 700); }
-      else flashAlert('Copy failed');
+  /* Ingredient manager rendering */
+  function renderIngredientList(){
+    ingListEl.innerHTML = '';
+    const names = Object.keys(densities).sort((a,b)=>a.localeCompare(b));
+    if(names.length === 0){
+      ingListEl.appendChild(el('div',{class:'empty-note'}, 'No ingredients saved. Add a name + density above.'));
+      return;
+    }
+    for(const n of names){
+      const row = el('div',{style:'display:flex;gap:8px;align-items:center;margin-bottom:6px'});
+      const nameSpan = el('div',{style:'flex:1;font-weight:600'}, n);
+      const densInput = el('input',{type:'number', value:densities[n], style:'width:100px;padding:6px;border-radius:6px;border:1px solid #eee'});
+      densInput.addEventListener('change', (e) => {
+        const v = parseFloat(e.target.value);
+        if(!isNaN(v) && v > 0){ densities[n] = v; saveDensities(); if(autoConvertToggle.checked) for(const tr of tbody.querySelectorAll('tr')){ const sel = tr.querySelector('.ing-select'); if(sel && sel.value === n) convertRow(tr); } } else { e.target.value = densities[n]; alert('Density must be positive'); }
+      });
+      const del = el('button',{class:'small removeBtn'}, 'Delete');
+      del.style.padding = '6px 8px';
+      del.addEventListener('click', ()=> {
+        if(!confirm(`Delete "${n}"?`)) return;
+        delete densities[n];
+        saveDensities();
+        renderIngredientList();
+        updateSelects();
+        for(const tr of tbody.querySelectorAll('tr')) {
+          const sel = tr.querySelector('.ing-select');
+          if(sel && sel.value === n){ sel.value = ''; tr.querySelector('.conv-cell').textContent = 'Unknown density'; }
+        }
+        saveRows();
+      });
+      row.appendChild(nameSpan); row.appendChild(densInput); row.appendChild(del);
+      ingListEl.appendChild(row);
+    }
+    savedCountEl.textContent = `${Object.keys(densities).length} ingredients`;
+  }
+
+  addIngredientBtn && addIngredientBtn.addEventListener && addIngredientBtn.addEventListener('click', ()=> {
+    const name = (newIngName && newIngName.value || '').trim();
+    const dens = parseFloat(newIngDensity && newIngDensity.value);
+    if(!name) return alert('Enter an ingredient name');
+    if(isNaN(dens) || dens <= 0) return alert('Enter a valid density (g per cup)');
+    densities[name] = dens;
+    saveDensities();
+    newIngName.value = '';
+    newIngDensity.value = '';
+    renderIngredientList();
+    updateSelects();
+  });
+
+  function updateSelects(){
+    const names = Object.keys(densities).sort((a,b)=>a.localeCompare(b));
+    for(const sel of tbody.querySelectorAll('.ing-select')){
+      const prev = sel.value;
+      sel.innerHTML = '';
+      sel.appendChild(el('option',{value:''}, '— pick ingredient —'));
+      for(const n of names){ const o = el('option',{value:n}, n); if(n === prev) o.selected = true; sel.appendChild(o); }
+    }
+  }
+
+  /* reset & clear */
+  resetDefaultsBtn && resetDefaultsBtn.addEventListener && resetDefaultsBtn.addEventListener('click', ()=> {
+    if(!confirm('Reset to default ingredient densities?')) return;
+    densities = {...DEFAULT_DENSITIES};
+    saveDensities();
+    renderIngredientList();
+    updateSelects();
+  });
+
+  clearStorageBtn && clearStorageBtn.addEventListener && clearStorageBtn.addEventListener('click', ()=> {
+    if(!confirm('Clear saved densities and rows from localStorage?')) return;
+    try { localStorage.removeItem(STORAGE_ING); localStorage.removeItem(STORAGE_ROWS); } catch(e){ console.warn(e); }
+    densities = {...DEFAULT_DENSITIES};
+    tbody.innerHTML = '';
+    saveDensities();
+    renderIngredientList();
+    renderSavedCount();
+  });
+
+  function renderSavedCount(){ savedCountEl.textContent = `${Object.keys(densities).length} ingredients`; }
+
+  /* hydrate saved rows */
+  function hydrateRows(){
+    const saved = loadRows();
+    if(saved && saved.length){
+      for(const r of saved) addRow({ingredient:r.ingredient||'', override:r.override||'', amount:r.amount||'', unit:r.unit||'g'}, false);
+    } else {
+      addRow({ingredient:'All-Purpose Flour', override:'', amount:'100', unit:'g'}, false);
+    }
+  }
+
+  /* main copy/export handlers */
+  function copyAllHandler(){
+    const rows = Array.from(tbody.querySelectorAll('tr')).map(rowToDisplayText);
+    const header = "Ingredient\tAmount\tConversions";
+    const text = [header, ...rows].join("\n");
+    copyText(text).then(ok => toast(ok ? 'Table copied' : 'Copy failed'));
+  }
+  function exportCSVHandler(){
+    const rows = Array.from(tbody.querySelectorAll('tr')).map(tr => {
+      const override = tr.querySelector('.override-input')?.value.trim();
+      const ing = tr.querySelector('.ing-select')?.value || '';
+      const display = override || ing || '';
+      const amt = tr.querySelector('.amount-input')?.value || '';
+      const unit = tr.querySelector('.unit-select')?.value || '';
+      const conv = tr.querySelector('.conv-cell')?.textContent || '';
+      return [display, amt, unit, conv].map(s => `"${String(s).replace(/"/g,'""')}"`).join(',');
+    });
+    const csv = ['"Ingredient","Amount","Unit","Conversions"', ...rows].join('\n');
+    const blob = new Blob([csv], {type:'text/csv'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url; a.download = `ingredient_conversions_${new Date().toISOString().slice(0,10)}.csv`; a.click(); URL.revokeObjectURL(url);
+  }
+
+  /* row display text */
+  function rowToDisplayText(tr){
+    const override = tr.querySelector('.override-input')?.value.trim();
+    const ing = tr.querySelector('.ing-select')?.value || '';
+    const display = override || ing || '(untitled)';
+    const amt = tr.querySelector('.amount-input')?.value || '';
+    const unit = tr.querySelector('.unit-select')?.value || '';
+    const conv = tr.querySelector('.conv-cell')?.textContent || '';
+    return `${display}\t${amt} ${unit}\t${conv}`;
+  }
+
+  /* event wiring after DOM loaded */
+  function attachEventHandlers(){
+    addRowBtn = document.getElementById('addRowBtn');
+    copyTableBtn = document.getElementById('copyTableBtn');
+    exportCSVBtn = document.getElementById('exportCSVBtn');
+    autoConvertToggle = document.getElementById('autoConvertToggle');
+    tbody = document.querySelector('#convTable tbody');
+    ingListEl = document.getElementById('ingList');
+    savedCountEl = document.getElementById('savedCount');
+    addIngredientBtn = document.getElementById('addIngredientBtn');
+    newIngName = document.getElementById('newIngName');
+    newIngDensity = document.getElementById('newIngDensity');
+    resetDefaultsBtn = document.getElementById('resetDefaults');
+    clearStorageBtn = document.getElementById('clearStorage');
+
+    addRowBtn && addRowBtn.addEventListener('click', ()=> addRow({ingredient:'',override:'',amount:'',unit:'g'}, true));
+    copyTableBtn && copyTableBtn.addEventListener('click', copyAllHandler);
+    exportCSVBtn && exportCSVBtn.addEventListener('click', exportCSVHandler);
+    autoConvertToggle && autoConvertToggle.addEventListener('change', ()=> { if(autoConvertToggle.checked) for(const tr of tbody.querySelectorAll('tr')) convertRow(tr); saveRows(); });
+
+    // add-ingredient handler (hook in the top-level add listener defined above)
+    addIngredientBtn = document.getElementById('addIngredientBtn');
+    newIngName = document.getElementById('newIngName');
+    newIngDensity = document.getElementById('newIngDensity');
+    addIngredientBtn && addIngredientBtn.addEventListener('click', () => {
+      const name = (newIngName.value || '').trim();
+      const dens = parseFloat(newIngDensity.value);
+      if(!name) return alert('Enter an ingredient name');
+      if(isNaN(dens) || dens <= 0) return alert('Enter a valid density (g per cup)');
+      densities[name] = dens; saveDensities(); newIngName.value=''; newIngDensity.value=''; renderIngredientList(); updateSelects();
+    });
+
+    // save rows debounce
+    tbody && tbody.addEventListener('input', ()=> {
+      if(window.__save_timer) clearTimeout(window.__save_timer);
+      window.__save_timer = setTimeout(()=> { saveRows(); window.__save_timer = null; }, 400);
     });
   }
-});
 
-/* ingredient manager UI */
-function renderIngredientList(){
-  ingListEl.innerHTML = '';
-  const names = Object.keys(densities).sort((a,b)=>a.localeCompare(b));
-  for(const n of names){
-    const row = el('div',{style:'display:flex;gap:8px;align-items:center;margin-bottom:6px'});
-    const nameSpan = el('div',{style:'flex:1;font-weight:600'}, n);
-    const densInput = el('input',{type:'number',value:densities[n],style:'width:100px;padding:6px;border-radius:6px;border:1px solid #eee'});
-    densInput.addEventListener('change', (e)=>{
-      const val = parseFloat(e.target.value);
-      if(!isNaN(val) && val > 0){ densities[n] = val; saveDensities(); if(autoConvertToggle.checked) for(const tr of tbody.querySelectorAll('tr')){ const sel = tr.querySelector('.ing-select'); if(sel && sel.value === n) convertRow(tr); } } else { e.target.value = densities[n]; alert('Density must be a positive number'); }
-    });
-    const del = el('button',{class:'small removeBtn'}, 'Delete'); del.style.padding='6px 8px';
-    del.addEventListener('click', ()=>{ if(!confirm(`Delete "${n}"?`)) return; delete densities[n]; saveDensities(); renderIngredientList(); updateSelects(); for(const tr of tbody.querySelectorAll('tr')){ const sel = tr.querySelector('.ing-select'); if(sel && sel.value === n){ sel.value=''; tr.querySelector('.conv-cell').textContent='Unknown density'; } } saveRows(); });
-    row.appendChild(nameSpan); row.appendChild(densInput); row.appendChild(del);
-    ingListEl.appendChild(row);
+  /* init function */
+  function init(){
+    // load densities from storage defensively
+    densities = loadDensities();
+    renderIngredientList();
+    hydrateRows();
+    updateSelects();
+    renderSavedCount();
+    attachEventHandlers();
   }
-  savedCountEl.textContent = `${Object.keys(densities).length} ingredients`;
-}
 
-/* add ingredient */
-addIngredientBtn.addEventListener('click', ()=>{
-  const name = newIngName.value.trim(); const dens = parseFloat(newIngDensity.value);
-  if(!name) return alert('Enter an ingredient name'); if(isNaN(dens) || dens <= 0) return alert('Enter a valid density');
-  densities[name] = dens; saveDensities(); newIngName.value=''; newIngDensity.value=''; renderIngredientList(); updateSelects();
-});
-
-/* reset / clear */
-resetDefaultsBtn.addEventListener('click', ()=>{ if(!confirm('Reset defaults?')) return; densities = {...DEFAULT_DENSITIES}; saveDensities(); renderIngredientList(); updateSelects(); });
-clearStorageBtn.addEventListener('click', ()=>{ if(!confirm('Clear saved data?')) return; localStorage.removeItem(STORAGE_ING); localStorage.removeItem(STORAGE_ROWS); densities = {...DEFAULT_DENSITIES}; tbody.innerHTML=''; saveDensities(); renderIngredientList(); renderSavedCount(); });
-
-/* update selects */
-function updateSelects(){
-  const names = Object.keys(densities).sort((a,b)=>a.localeCompare(b));
-  for(const sel of tbody.querySelectorAll('.ing-select')){
-    const prev = sel.value;
-    sel.innerHTML = '';
-    sel.appendChild(el('option',{value:''}, '— pick ingredient —'));
-    for(const n of names){ const o = el('option',{value:n}, n); if(n===prev) o.selected=true; sel.appendChild(o); }
+  /* DOM ready */
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
   }
-}
 
-/* hydrate rows */
-function hydrateRows(){
-  const saved = loadRows();
-  if(saved && saved.length){ for(const r of saved) addRow({ingredient:r.ingredient||'', override:r.override||'', amount:r.amount||'', unit:r.unit||'g'}, false); }
-  else addRow({ingredient:'All-Purpose Flour', override:'', amount:'100', unit:'g'}, false);
-}
+  /* small utilities exposed (not global) */
+  function updateSelects(){
+    const names = Object.keys(densities).sort((a,b)=>a.localeCompare(b));
+    for(const sel of document.querySelectorAll('.ing-select')){
+      const prev = sel.value;
+      sel.innerHTML = '';
+      sel.appendChild(el('option',{value:''}, '— pick ingredient —'));
+      for(const n of names){
+        const o = el('option',{value:n}, n);
+        if(n === prev) o.selected = true;
+        sel.appendChild(o);
+      }
+    }
+  }
 
-/* helpers */
-function escape(s){ return String(s).replace(/\s+/g,' ').trim(); }
-function flashAlert(msg){ try{ if(window.Toastify){ /* no-op */ } }catch(e){} alert(msg); }
-
-/* init */
-(function init(){
-  renderIngredientList();
-  hydrateRows();
-  updateSelects();
 })();
-
-/* save rows debounce */
-let saveTimer=null;
-tbody.addEventListener('input', ()=>{ if(saveTimer) clearTimeout(saveTimer); saveTimer=setTimeout(()=>{ saveRows(); saveTimer=null; }, 450); });
-
 </script>
 </body>
 </html>
